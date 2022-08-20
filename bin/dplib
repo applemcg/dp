@@ -82,55 +82,9 @@ dp_test ()
 }
 dp_utilities () 
 { 
-    : date: 2022-08-19;
+    : functions used by dplib functions;
     : date: 2022-08-20;
-    ${*:-echo} whf do_whf functions declare libfuns
-}
-dp () 
-{ 
-    : do Dot Prof;
-    : date: 2022-08-19;
-    : date: 2022-08-20;
-    set -- ./.prof;
-    [[ -f $1 ]] || { 
-        cp $(dp_dev)/dot.prof $1
-    };
-    backup $1;
-    source $1
-}
-dp_lib () 
-{ 
-    : the name of the DP library;
-    : date: 2022-08-19;
-    : date: 2022-08-20;
-    ${*:-echo} $(needir $(dp_dev))/dplib
-}
-dp_list () 
-{ 
-    : functions in the DP family;
-    : date: 2022-08-19;
-    : date: 2022-08-20;
-    ${*:-echo} dp $( sfg dp_ )
-}
-dp_test () 
-{ 
-    : home for DP testing, "it's shaping up in the FALSE block";
-    : date: 2022-08-19;
-    : date: 2022-08-20;
-    ${*:-echo} $(needir $(dp_dev)/dp_test)
-}
-dp_install () 
-{ 
-    : move the run-time components into place;
-    : date: 2022-08-20;
-    ln -f $(dp_lib) $(needir $(dp_dev)/bin);
-    ln -f $(dp_dev)/dot.prof $(needir $(dp_dev)/lib)
-}
-dp_utilities () 
-{ 
-    : date: 2022-08-19;
-    : date: 2022-08-20;
-    ${*:-echo} whf do_whf functions declare libfuns
+    declare -f $(comm -23 <(app_fun $(functions dplib) 2> /dev/null) <( dp_all| tpl))
 }
 dp_install () 
 { 
@@ -143,12 +97,6 @@ dp_install ()
     ln -f $(dp_utillib) $bin;
     chmod 775 $bin/*;
     ln -f $(dp_dev)/dot.prof $lib
-}
-dp_utilities () 
-{ 
-    : functions used by dplib functions;
-    : date: 2022-08-20;
-    declare -f $(comm -23 <(app_fun $(functions dplib) 2> /dev/null) <( dp_all| tpl))
 }
 dp_utillib () 
 { 
@@ -164,3 +112,4 @@ dp_init ()
     : date: 2022-08-20;
     source $(which dputillib)
 }
+eval dp_init 1>&2
