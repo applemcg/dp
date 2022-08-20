@@ -83,6 +83,7 @@ dp_test ()
 dp_utilities () 
 { 
     : date: 2022-08-19;
+    : date: 2022-08-20;
     ${*:-echo} whf do_whf functions declare libfuns
 }
 dp () 
@@ -124,4 +125,42 @@ dp_install ()
     : date: 2022-08-20;
     ln -f $(dp_lib) $(needir $(dp_dev)/bin);
     ln -f $(dp_dev)/dot.prof $(needir $(dp_dev)/lib)
+}
+dp_utilities () 
+{ 
+    : date: 2022-08-19;
+    : date: 2022-08-20;
+    ${*:-echo} whf do_whf functions declare libfuns
+}
+dp_install () 
+{ 
+    : move the run-time components into place;
+    : date: 2022-08-20;
+    local bin=$(needir $(dp_dev)/bin);
+    local lib=$(needir $(dp_dev)/lib);
+    :;
+    ln -f $(dp_lib) $bin;
+    ln -f $(dp_utillib) $bin;
+    chmod 775 $bin/*;
+    ln -f $(dp_dev)/dot.prof $lib
+}
+dp_utilities () 
+{ 
+    : functions used by dplib functions;
+    : date: 2022-08-20;
+    declare -f $(comm -23 <(app_fun $(functions dplib) 2> /dev/null) <( dp_all| tpl))
+}
+dp_utillib () 
+{ 
+    : the name of the DP library;
+    : and we have a slight mismatch because of naming conventions;
+    : date: 2022-08-19;
+    : date: 2022-08-20;
+    ${*:-echo} $(needir $(dp_dev))/dputillib
+}
+dp_init () 
+{ 
+    : "bring along it's utillib";
+    : date: 2022-08-20;
+    source $(which dputillib)
 }

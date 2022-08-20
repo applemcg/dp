@@ -1,0 +1,404 @@
+abstract () 
+{ 
+    : "show a function's abstract, present or NOT";
+    : date: 2021-10-09;
+    : date: 2022-04-21;
+    declare -f ${1:-$(myname)} | awk '
+
+        NR == 1  { name = $1 };
+	NR == 3  {
+                    abstract = $0
+		    # printf "1: %s\t2:%s\t3:%s\n", $1, $2, $3
+		    if ( $2 ~ /:$/)
+		    {
+		        # it is a TAG, so
+                        abstract = ""
+		    }
+		    else
+		    {
+		        sub(/ *: "*/,"",abstract);  # trim leading :.*"
+		        sub(/"*;$/,"",abstract)     # and trailing "*;
+		    }
+		    printf "%s\t%s\n", name, abstract
+		    exit
+		  }
+    '
+}
+app_fun () 
+{ 
+    : recursively w/for_nomar and app_funuses, find all called functions;
+    : date: 2016-11-10;
+    : date: 2018-10-05 key feature set PRIOR, add NEW;
+    : date: 2019-08-29;
+    set $* $(for_nomar app_funuses $*);
+    echo $* | wpl | sort -u
+}
+app_funuses () 
+{ 
+    : names the functions the function argument uses,;
+    : omitting _ underscore names -- e.g. local functions;
+    : date: 2017-08-16;
+    : date: 2019-08-29;
+    : date: 2019-11-16 replace foreach fun_alltype RUN fun_words $* with TYPE_WORD;
+    type_word $* | awk "
+
+        \$1 !~ /^function$/ { next; }
+        \$2 !~ /^$1$/       { print \$2 }
+    "
+}
+args_uniq () 
+{ 
+    : date: 2017-03-26;
+    : date: 2018-10-29;
+    : debug $*;
+    : date: 2019-08-29;
+    : date: 2022-06-23;
+    awk '
+    BEGIN {
+	    for (i=1; i < ARGC; i++) {
+                 j = ARGV[i];
+                 if (!printed[j]++) {
+                     printf "%s ", j;
+		 }
+	     }
+	     printf "\n"
+	  }
+    ' $*
+}
+backup () 
+{ 
+    : ~ backup file ...;
+    : date: 2019-12-28;
+    : date: 2022-04-15;
+    : date: 2022-05-29;
+    fun_asapp $* && return 1;
+    backup_init;
+    for file in "$@";
+    do
+        backup_one $file;
+    done
+}
+backup_init () 
+{ 
+    : default BACKUP is .bak ... directory;
+    : default VERSION is .ver directory;
+    : to use NON-DOT directory names, set USER_BACKUP_AREA;
+    : to place in the hierarchy like "/Windows/Fileshare";
+    : date: 2019-11-16;
+    :;
+    set -- ${BACKUP_DEFAULT:=.bak .ver};
+    debug ENTRY $*;
+    setenv BACKUP_DIRECTORY $1 > /dev/null;
+    setenv VERSION_DIRECTORY $2 > /dev/null;
+    debug DIRECTORY: $BACKUP_DIRECTORY;
+    debug VERSION: $VERSION_DIRECTORY;
+    pause
+}
+backup_one () 
+{ 
+    : allows backup from another directory.;
+    : avoid temptation to include as opening steps in backup_here,;
+    : date: 2019-12-20 -- notfile test;
+    : date: 2022-04-15;
+    debug ENTRY $*;
+    report_notfile "${1:-/dev/null}" && return 1;
+    indir $(dirname $1) backup_here $(basename $1)
+}
+debug () 
+{ 
+    printf "%-21s\t%-21s\t%-21s : %s\n" ${FUNCNAME[3]} ${FUNCNAME[2]} ${FUNCNAME[1]} "$*" 1>&2
+}
+declare () 
+{ 
+    : insert ... syntactic sugar into shell functions;
+    : date: 2021-01-03;
+    : date: 2021-03-09 the BUG was in FUNC_ARGS;
+    : date: 2021-04-14;
+    : date: 2022-05-22;
+    case $1 in 
+        -f)
+            shift;
+            debug A: $#, $@;
+            : test for function names;
+            set -- $(func_args $@);
+            debug B: $#, $@;
+            [[ $# -lt 1 ]] && return 1;
+            :;
+            : there are some, proceed;
+            command declare -f $@ | fold_pipedots
+        ;;
+        *)
+            debug D: $#, $@;
+            command declare $@
+        ;;
+    esac
+}
+eachfunction () 
+{ 
+    : list everyfunction, including same function later in file, input;
+    awk '$2 ~ /[(][)]/ { print $1 }' $*
+}
+field () 
+{ 
+    : date: 2017-05-11;
+    : date: 2017-07-18;
+    : date: 2022-08-19;
+    awk "{ print \$$1 }"
+}
+fold_pipedots () 
+{ 
+    : RE folds line with PIPE followed by ... s;
+    : the RE allows zero or more spaces after the Pipe Symbol;
+    : .. a Dot followed by zero or more Dots or Spaces,;
+    : .. closed by a space, which separates .s from the command;
+    : also, fold --.arg arguments to a shell command;
+    : related: multisymbol;
+    : date: 2021-04-14;
+    : date: 2021-05-22;
+    : date: 2021-05-30;
+    sed '
+        s/| *\([.][. ]*\) /|\
+    \1 /g; s/ \(--[a-zA-Z][a-zA-Z]*\)/ \\\
+        \1/g'
+}
+for_nomar () 
+{ 
+    : continue executing first arg as command,;
+    : until number of returned arguments is unchanged.;
+    : date: 2016-11-10;
+    : date: 2019-03-10 isolating the command saves ignoring it in the loop;
+    : app_trace $*;
+    : date: 2019-08-29;
+    : date: 2022-06-09;
+    local cmmd=$1;
+    shift;
+    : debug ENTRY cmmd: $cmmd, ARGS: $*;
+    while true; do
+        local num=$#;
+        set $(args_uniq $* $($cmmd $*));
+        debug While $CMMD "num: $num, $#";
+        [[ $num -eq $# ]] && break;
+    done;
+    echo $*
+}
+foreach () 
+{ 
+    : ~ command arg ...;
+    : executes COMMAND foreach arg ...;
+    : date: 2017-05-12;
+    : date: 2017-07-16;
+    : date: 2019-10-28 QUOTE the ARG;
+    : date: 2021-06-06 require ONLY 1 arg, go quietly if so;
+    : date: 2021-06-12;
+    : date: 2022-03-15;
+    : date: 2022-03-20;
+    : date: 2022-08-02;
+    : date: 2022-08-19;
+    debug ENTRY $# $1;
+    local cmd="$1";
+    shift;
+    if_missingargs 1 $* && return 1;
+    for arg in $@;
+    do
+        : debug RUN $cmd "$arg";
+        $cmd "$arg";
+    done
+}
+fun_asapp () 
+{ 
+    : smart family main function, checks to see if ARG is a sub-function;
+    : usage: fun_asapp args ... And return;
+    : date: 2022-04-09;
+    debug ENTRY $# $*;
+    [[ $# -lt 1 ]] && { 
+        debug ZERO Args;
+        return 1
+    };
+    local caller=$(myname 2);
+    local subfun=$1;
+    local famfun=${caller}_$subfun;
+    debug famfun: $famfun;
+    pause;
+    isfunction $famfun && { 
+        shift;
+        fun_subuse $caller $subfun;
+        debug FUNCTION famfun $famfun;
+        $famfun $*;
+        return
+    };
+    debug NOT a Function $famfun;
+    return 2
+}
+fun_log () 
+{ 
+    : date: 2017-05-11;
+    : date: 2019-04-09 added calling function log;
+    : todo: reconcile fun{,ction}_log;
+    : date: 2021-07-05;
+    : date: 2021-07-16;
+    : date: 2022-05-15;
+    if_missingargs 1 $* && return 1;
+    date "+%F-%T%t%a %b %d%t${*:2}%t$PWD" >> $1
+}
+fun_subuse () 
+{ 
+    : log fun_asapp use, my main and sub_function;
+    : date: 2022-05-15;
+    local file=$(needir $(lib)/subuse/$1)/$2;
+    debug file: $file;
+    fun_log $file ${*:2}
+}
+func_args () 
+{ 
+    : use TYPE to simulate declare -f;
+    : Thou Shalt NOT sort!;
+    : date: 2021-03-09 much more explict TYPE -A test in AWK;
+    : date: 2021-05-13;
+    type -a ${@:-/dev/null} 2> /dev/null | awk '
+        $2$3$4 ~ /isafunction/ && \
+	$1 ~ /^[.a-zA-Z0-9][.a-zA-Z0-9_]*$/ { print $1 }
+    '
+}
+functions () 
+{ 
+    : list functions ONCE in order of occurrence;
+    : due to historical precendence;
+    : lesson: time spent by not using PRINTFIRST,;
+    eachfunction $* | awk '!p[$1]++'
+}
+home () 
+{ 
+    : moved to APP_HOME in users .profile, defaulting to HOME;
+    : installed app users, e.g. todo, backup, should set APP_HOME;
+    : date: 2022-04-09;
+    : date: 2022-05-22;
+    :;
+    ${*:-echo} ${APP_HOME:=$HOME}
+}
+if_missingargs () 
+{ 
+    : called N arg ..., displaying caller if insufficient argcount;
+    : related: foreach;
+    : date: 2021-01-03;
+    : date: 2021-08-18;
+    : date: 2022-04-29;
+    : date: 2022-05-22;
+    local shouldHave=$1;
+    shift;
+    debug "$#: $*";
+    report_notargcount $shouldHave $# || return 1;
+    : there were missing args;
+    declare -f $(myname 2);
+    return
+}
+isfunction () 
+{ 
+    : ~ function;
+    : returns TRUTH of argument as FUNCTION;
+    declare -f ${1:-/dev/null} > /dev/null
+}
+lib () 
+{ 
+    : a big fuss over ALT_HOME not in the ENVIRONMENT;
+    : todo: see if we can eliminate its use in sh-bang;
+    : app_trace home: $(home);
+    : app_trace ALT_HOME: ${ALT_HOME};
+    : date: 2022-02-21;
+    : date: 2022-02-23;
+    ${*:-echo} $(home)/lib
+}
+myname () 
+{ 
+    : e.g. myname "[n, default 1]";
+    : returns name of caller OR callers caller ...;
+    : date: 2018-02-16;
+    : date: 2021-02-18 attempt to accomodate zsh;
+    : date: 2022-04-29;
+    echo ${FUNCNAME[${1:-1}]}
+}
+needir () 
+{ 
+    : date: 2017-05-29;
+    : makes non-existent directory argument and returns name;
+    : date: 2018-02-16;
+    : date: 2020-03-04;
+    : date: 2022-08-02;
+    : date: 2022-08-13;
+    report_notargcount 1 $# needed_directory && return 1;
+    debug ENTRY $1;
+    [[ -d "$1" ]] || mkdir -p "$1";
+    echo "$1"
+}
+pause () 
+{ 
+    local mapa=${FUNCNAME[1]};
+    read -p "[return] or {Ctrl-C}   ? " < /dev/tty
+}
+rdb_hdr () 
+{ 
+    : date: 2017-05-12;
+    : debug $*;
+    : first the names, then equal-width dashes,;
+    : with one or more, spaces to a single TAB;
+    : date: 2022-05-29;
+    ( echo $*;
+    echo $* | tr 'a-zA-Z0-9_' '-' ) | sed 's/  */ /g' | tr ' ' '\t'
+}
+reading () 
+{ 
+    : date: 2021-02-21;
+    : date: 2022-02-22;
+    ${*:-echo} $(home)/git/applemcg.github.io/reading
+}
+report_notargcount () 
+{ 
+    : date: 2018-02-16;
+    : date: 2021-08-17;
+    : date: 2021-08-18;
+    : date: 2022-04-29;
+    : date: 2022-06-14;
+    debug "$#: $*";
+    [[ $2 -ge $1 ]] && return 1;
+    report_usage need at least $1 arg/s: ${*:3}
+}
+report_notpipe () 
+{ 
+    : returns: TRUE when STDIN "ISN'T" a pipe;
+    : ... FALSE if stdin is a pipe;
+    : date: 2018-02-16;
+    [[ -p /dev/stdin ]] && return 1;
+    report_usage "ISN'T" reading a pipe
+}
+report_usage () 
+{ 
+    : writes: usage message of report_... caller FAILURE to STDERR;
+    : date: 2018-03-30;
+    : date: 2022-04-29;
+    local caller=$(myname 3);
+    : case $caller in;
+    : diff_pair;
+    : callStack;
+    : read -p "HALT, use ctrl-C" < /dev/tty > /dev/tty;
+    :;
+    : esac;
+    echo USAGE $caller: $* 1>&2
+}
+sfg () 
+{ 
+    : date: 2019-12-21 back to our roots, Set Functions Grep;
+    : date: 2021-04-14;
+    : date: 2022-08-02;
+    set | functions | grep "${@:-.}"
+}
+tpl () 
+{ 
+    : returns STDIN or NAMEd files as a Token Per Line;
+    : date: 2020-11-14;
+    cat ${*:--} | tr -s ' \t' '\n'
+}
+wpl () 
+{ 
+    : date: 2022-08-02;
+    report_notpipe && return 1;
+    tr -cs 'A-Za-z0-9_' '\n'
+}
