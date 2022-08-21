@@ -1,0 +1,19 @@
+source dplib
+dp_version ()
+{
+     : link to "(or echo)" the changelog and show the Version Number
+     ${*:-open} https://applemcg.github.io/shelf.html#dp_Changelog
+     comment 0.1.1     
+}
+false &&
+{
+    return;
+    dp_utilities | tee $(dp_utillib)
+    dp_install
+    which dputillib
+}
+on
+    backup .prof
+    ls -lisart .prof $(find . -type f | usefulfiles)   
+off
+
