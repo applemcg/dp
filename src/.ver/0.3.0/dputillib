@@ -104,14 +104,6 @@ backup_one ()
     report_notfile "${1:-/dev/null}" && return 1;
     indir $(dirname $1) backup_here $(basename $1)
 }
-comment () 
-{ 
-    : since the DECLARE -F idiom eats;
-    : date: 2018-02-16;
-    : date: 2021-03-24;
-    : date: 2022-04-29;
-    echo $* 1>&2
-}
 debug () 
 { 
     return
@@ -374,6 +366,17 @@ reading ()
     : date: 2021-02-21;
     : date: 2022-02-22;
     ${*:-echo} $(home)/git/applemcg.github.io/reading
+}
+report_notargcount () 
+{ 
+    : date: 2018-02-16;
+    : date: 2021-08-17;
+    : date: 2021-08-18;
+    : date: 2022-04-29;
+    : date: 2022-06-14;
+    debug "$#: $*";
+    [[ $2 -ge $1 ]] && return 1;
+    report_usage need at least $1 arg/s: ${*:3}
 }
 report_notfile () 
 { 

@@ -1,59 +1,13 @@
+source functionlib
 source dplib
-dp_version ()
-{
-     : link to "(or echo)" the changelog and show the Version Number
-     ${*:-open} https://applemcg.github.io/shelf.html#dp_Changelog
-     echo 0.3.0
-}
-dp_install () 
+dp_version () 
 { 
-    : move the run-time components into place;
-    : date: 2022-08-20;
-    local bin=$(needir $(dp_root)/bin);
-    local lib=$(needir $(dp_root)/lib);
-    :;
-    ln -f ./README.md $(dp_root)
-    :;
-    chmod 775 ./dp{,util}lib    
-    ln -f ./dplib     $bin;
-    ln -f ./dputillib $bin;
-    :;
-    ln -f ./dot.prof  $lib
-}
-dp_all () 
-{ 
-    : all the functions in the DP family;
+    : link to "(or echo)" the changelog and show the Version Number;
     : date: 2022-08-22;
-    ${*:-echo} dp dp_{abstracts,all,diff,example,funs,init,install,obsolete,profs,root,test,utilities,version}
+    ${*:-open} https://applemcg.github.io/shelf.html#dp_Changelog;
+    echo 0.3.0
 }
-backup_ver () 
-{ 
-    : creates a VERSION of the CURRENT BACKUP;
-    : VER_TIME is a DATE/TIME stamped directory in the VERSION directory;
-    : a LINK is sufficient if not mandatory.;
-    : see SEMANTIC Versioning online
-    : date: 2017-03-05;
-    : date: 2019-04-28 remove opional argument name for version;
-    : date: 2020-05-02 add user-definable BACKUP_VERSION_FORMAT;
-    : ${BACKUP_VERSION_FORMAT:="%Y%m_%b/%d_%a/%H%M%S"};
-    : date: 2022-05-22;
-    backup_directories;
-    report_notdirectory $BACKUP_DIRECTORY && return 1;
-    local THIS_VERSION=${1:-$(date +"${BACKUP_VERSION_FORMAT}")};
-    debug VERSION_DIRECTORY $VERSION_DIRECTORY;
-    debug VERSION_DIRECTORY $vername;
-    set -- $(backup_files | sed "s/^/$BACKUP_DIRECTORY\//");
-    set -- ${*:-/dev/null};
-    debug args $*;
-    : considering we may need to overwrite a NAMED version
-    : and since time-stamped Versions are to the second,
-    : its harmelss in the default case
-    :
-    rm -rf "$VERSION_DIRECTORY/$THIS_VERSION"
-    : 
-    ln -f $* $(needir "$VERSION_DIRECTORY/$THIS_VERSION");
-    comment "$VERSION_DIRECTORY/$THIS_VERSION"
-}
+
 false &&
 {
     return;
@@ -61,7 +15,9 @@ false &&
     dp_install
     which dputillib
     backup .prof    
-    ls -lisart .prof $(find . -type f | usefulfiles)       
+    ls -lisart .prof $(find . -type f | usefulfiles)
+    set -- fun_peek; $1 .prof  $1
+    dp_diff ; comment missing args
 }
 on
 off    
@@ -71,7 +27,9 @@ off
     # foreach yy $(dp_all)
     def compare_all_lib
     compare_all_lib
-    backup_ver 0.2.a
-
+    # funslib $( do_whf $(fdp)| field 1)
+    dp_install
+    backup_ver $(dp_version)
+    
 
 
