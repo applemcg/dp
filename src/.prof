@@ -3,14 +3,7 @@ dp_version ()
 {
      : link to "(or echo)" the changelog and show the Version Number
      ${*:-open} https://applemcg.github.io/shelf.html#dp_Changelog
-     comment 0.2.0
-}
-dp_init () 
-{ 
-    : "bring along it's utillib";
-    : date: 2022-08-20;
-    source $(which dputillib)
-    isfunction dp_obsolete && dp_obsolete unset
+     echo 0.3.0
 }
 dp_install () 
 { 
@@ -19,74 +12,48 @@ dp_install ()
     local bin=$(needir $(dp_root)/bin);
     local lib=$(needir $(dp_root)/lib);
     :;
-    chmod 775 ./dp{,util}lib
+    ln -f ./README.md $(dp_root)
     :;
+    chmod 775 ./dp{,util}lib    
     ln -f ./dplib     $bin;
     ln -f ./dputillib $bin;
     :;
     ln -f ./dot.prof  $lib
 }
-dp_root () 
+dp_all () 
 { 
-    : the development, think ~/src/... directory for source control;
-    ${*:-echo} $(needir $HOME/Dropbox/marty3/git/dp)
+    : all the functions in the DP family;
+    : date: 2022-08-22;
+    ${*:-echo} dp dp_{abstracts,all,diff,example,funs,init,install,obsolete,profs,root,test,utilities,version}
 }
-dp_obsolete ()
-{
-    : made obsolete by separtating SRC from BITMELD runtime
-    ${*:-echo} dp_{obsolete,lib,utillib} 
-}
-dp () 
+backup_ver () 
 { 
-    : do Dot Prof;
-    : date: 2022-08-19;
-    : date: 2022-08-20;
-    set -- ./.prof;
-    [[ -f $1 ]] || { 
-        cp $(dp_root)/lib/dot.prof $1
-    };
-    isfunction backup && backup $1;
-    source $1
+    : creates a VERSION of the CURRENT BACKUP;
+    : VER_TIME is a DATE/TIME stamped directory in the VERSION directory;
+    : a LINK is sufficient if not mandatory.;
+    : see SEMANTIC Versioning online
+    : date: 2017-03-05;
+    : date: 2019-04-28 remove opional argument name for version;
+    : date: 2020-05-02 add user-definable BACKUP_VERSION_FORMAT;
+    : ${BACKUP_VERSION_FORMAT:="%Y%m_%b/%d_%a/%H%M%S"};
+    : date: 2022-05-22;
+    backup_directories;
+    report_notdirectory $BACKUP_DIRECTORY && return 1;
+    local THIS_VERSION=${1:-$(date +"${BACKUP_VERSION_FORMAT}")};
+    debug VERSION_DIRECTORY $VERSION_DIRECTORY;
+    debug VERSION_DIRECTORY $vername;
+    set -- $(backup_files | sed "s/^/$BACKUP_DIRECTORY\//");
+    set -- ${*:-/dev/null};
+    debug args $*;
+    : considering we may need to overwrite a NAMED version
+    : and since time-stamped Versions are to the second,
+    : its harmelss in the default case
+    :
+    rm -rf "$VERSION_DIRECTORY/$THIS_VERSION"
+    : 
+    ln -f $* $(needir "$VERSION_DIRECTORY/$THIS_VERSION");
+    comment "$VERSION_DIRECTORY/$THIS_VERSION"
 }
-dp_test () 
-{ 
-    : home for DP testing, "it's shaping up in the FALSE block";
-    : date: 2022-08-19;
-    : date: 2022-08-20;
-    ${*:-echo} $(needir $(dp_root)/dp_test)
-}
-compare_all_lib () 
-{ 
-    : compare set vs lib function lists;
-    dp_all | tpl > .all;
-    functions ./dplib | sort > .lib;
-    comm $* .all .lib;
-    printf "%s\t%s\t%s\n" .all .lib BOTH
-}
-fun_starter () 
-{ 
-    : generate STDERR-directed function calls to any_INIT functions;
-    : date: 2018-02-16;
-    : date: 2020-03-21 ONLY echo the INIT functions on ALL;
-    : date: 2022-03-17;
-    debug A "$@";
-    report_notfile "$1" && return 1;
-    local args=$(cat "$1" |functions | grep _init$ | sort);
-    debug B args $args;
-    for fun in $args;
-    do
-        printf "%s %s 1>&2\n" eval $fun;
-    done;
-    debug END "$@"
-}
-yy () 
-{ 
-    isfunction $1 && echo $1
-}
-dp_all ()
-{
-    ${*:-echo} dp dp_{abstracts,all,example,funs,init,install,profs,root,test,utilities,version}
-}    
 false &&
 {
     return;
@@ -103,7 +70,8 @@ off
     # source ./dplib;
     # foreach yy $(dp_all)
     def compare_all_lib
-    compare_all_lib    
+    compare_all_lib
+    backup_ver 0.2.a
 
 
 

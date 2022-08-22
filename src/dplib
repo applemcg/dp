@@ -3,6 +3,7 @@ dp ()
     : do Dot Prof;
     : date: 2022-08-19;
     : date: 2022-08-20;
+    : date: 2022-08-22;
     set -- ./.prof;
     [[ -f $1 ]] || { 
         cp $(dp_root)/lib/dot.prof $1
@@ -18,6 +19,8 @@ dp_abstracts ()
 }
 dp_all () 
 { 
+    : all the functions in the DP family;
+    : date: 2022-08-22;
     ${*:-echo} dp dp_{abstracts,all,example,funs,init,install,profs,root,test,utilities,version}
 }
 dp_example () 
@@ -41,6 +44,7 @@ dp_init ()
 { 
     : "bring along it's utillib";
     : date: 2022-08-20;
+    : date: 2022-08-22;
     source $(which dputillib);
     isfunction dp_obsolete && dp_obsolete unset
 }
@@ -48,6 +52,7 @@ dp_install ()
 { 
     : move the run-time components into place;
     : date: 2022-08-20;
+    : date: 2022-08-22;
     local bin=$(needir $(dp_root)/bin);
     local lib=$(needir $(dp_root)/lib);
     :;
@@ -68,6 +73,7 @@ dp_profs ()
 dp_root () 
 { 
     : the development, think ~/src/... directory for source control;
+    : date: 2022-08-22;
     ${*:-echo} $(needir $HOME/Dropbox/marty3/git/dp)
 }
 dp_test () 
@@ -75,6 +81,7 @@ dp_test ()
     : home for DP testing, "it's shaping up in the FALSE block";
     : date: 2022-08-19;
     : date: 2022-08-20;
+    : date: 2022-08-22;
     ${*:-echo} $(needir $(dp_root)/dp_test)
 }
 dp_utilities () 
@@ -86,7 +93,34 @@ dp_utilities ()
 dp_version () 
 { 
     : link to "(or echo)" the changelog and show the Version Number;
+    : date: 2022-08-22;
     ${*:-open} https://applemcg.github.io/shelf.html#dp_Changelog;
     comment 0.2.0
+}
+dp_obsolete () 
+{ 
+    : made obsolete by separtating SRC from BITMELD runtime;
+    : date: 2022-08-22;
+    ${*:-echo} dp_{obsolete,lib,utillib}
+}
+dp_diff () 
+{ 
+    : diff LIB and .prof versions of functions;
+    : lessons: ?? foreach was OK but Examine your TEST CASE, steady on DIFF ?;
+    : date: 2022-08-22;
+    debug ENTRY $# $*;
+    report_notargcount 2 $# && return 1;
+    local lib=$(which $1);
+    shift;
+    debug LIB: $lib;
+    for fun in $@;
+    do
+        debug FUN: $fun;
+        fun_peek $fun .prof > .dotp;
+        fun_peek $fun $lib > .dlib;
+        diff .dlib .dotp 1>&2 || { 
+            printf "RETURN $?\n< $lib\n$fun\t.prof\n========\n\n\n"
+        };
+    done
 }
 eval dp_init 1>&2

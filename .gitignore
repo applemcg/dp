@@ -2,9 +2,12 @@
 # directories
 
 .bak
-.ver/20*
+.ver/20[2-4][0-9]*
+bin
+lib
 
 # files
 
 *.html
 .*
+

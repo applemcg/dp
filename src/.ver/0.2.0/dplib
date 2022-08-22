@@ -5,9 +5,9 @@ dp ()
     : date: 2022-08-20;
     set -- ./.prof;
     [[ -f $1 ]] || { 
-        cp $(dp_dev)/dot.prof $1
+        cp $(dp_root)/lib/dot.prof $1
     };
-    backup $1;
+    isfunction backup && backup $1;
     source $1
 }
 dp_abstracts () 
@@ -18,14 +18,7 @@ dp_abstracts ()
 }
 dp_all () 
 { 
-    : default list of DP functions;
-    debug ENTRY $*;
-    ${*:-echo} dp $(sfg dp_)
-}
-dp_dev () 
-{ 
-    : the development, think ~/src/... directory for source control;
-    ${*:-echo} $(needir $HOME/Dropbox/marty3/git/dp)
+    ${*:-echo} dp dp_{abstracts,all,example,funs,init,install,profs,root,test,utilities,version}
 }
 dp_example () 
 { 
@@ -44,19 +37,26 @@ dp_funs ()
     : date: 2022-08-19;
     functions $1 | sed "s=$=	$1="
 }
-dp_lib () 
+dp_init () 
 { 
-    : the name of the DP library;
-    : date: 2022-08-19;
+    : "bring along it's utillib";
     : date: 2022-08-20;
-    ${*:-echo} $(needir $(dp_dev))/dplib
+    source $(which dputillib);
+    isfunction dp_obsolete && dp_obsolete unset
 }
-dp_list () 
+dp_install () 
 { 
-    : functions in the DP family;
-    : date: 2022-08-19;
+    : move the run-time components into place;
     : date: 2022-08-20;
-    ${*:-echo} dp $( sfg dp_ )
+    local bin=$(needir $(dp_root)/bin);
+    local lib=$(needir $(dp_root)/lib);
+    :;
+    chmod 775 ./dp{,util}lib;
+    :;
+    ln -f ./dplib $bin;
+    ln -f ./dputillib $bin;
+    :;
+    ln -f ./dot.prof $lib
 }
 dp_profs () 
 { 
@@ -65,20 +65,17 @@ dp_profs ()
     : date: 2022-08-19;
     find $(home) -type f -name .prof | egrep -v '.(ver|bak)/'
 }
-dp_qf () 
+dp_root () 
 { 
-    : named show Quick Function ...;
-    : date: 2019-08-11;
-    : date: 2021-08-28;
-    : date: 2022-08-19;
-    declare -f ${*:-qf} | tee .qf
+    : the development, think ~/src/... directory for source control;
+    ${*:-echo} $(needir $HOME/Dropbox/marty3/git/dp)
 }
 dp_test () 
 { 
     : home for DP testing, "it's shaping up in the FALSE block";
     : date: 2022-08-19;
     : date: 2022-08-20;
-    ${*:-echo} $(needir $(dp_dev)/dp_test)
+    ${*:-echo} $(needir $(dp_root)/dp_test)
 }
 dp_utilities () 
 { 
@@ -86,30 +83,10 @@ dp_utilities ()
     : date: 2022-08-20;
     declare -f $(comm -23 <(app_fun $(functions dplib) 2> /dev/null) <( dp_all| tpl))
 }
-dp_install () 
+dp_version () 
 { 
-    : move the run-time components into place;
-    : date: 2022-08-20;
-    local bin=$(needir $(dp_dev)/bin);
-    local lib=$(needir $(dp_dev)/lib);
-    :;
-    ln -f $(dp_lib) $bin;
-    ln -f $(dp_utillib) $bin;
-    chmod 775 $bin/*;
-    ln -f $(dp_dev)/dot.prof $lib
-}
-dp_utillib () 
-{ 
-    : the name of the DP library;
-    : and we have a slight mismatch because of naming conventions;
-    : date: 2022-08-19;
-    : date: 2022-08-20;
-    ${*:-echo} $(needir $(dp_dev))/dputillib
-}
-dp_init () 
-{ 
-    : "bring along it's utillib";
-    : date: 2022-08-20;
-    source $(which dputillib)
+    : link to "(or echo)" the changelog and show the Version Number;
+    ${*:-open} https://applemcg.github.io/shelf.html#dp_Changelog;
+    comment 0.2.0
 }
 eval dp_init 1>&2
