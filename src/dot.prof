@@ -1,10 +1,10 @@
-source functionlib
+source_existing functionlib
+source_existing dplib
 false &&
 {
     return;
 }
 on
-  do_whf $(functions .prof)
+    functions .prof
 off
     backup .prof
-}
