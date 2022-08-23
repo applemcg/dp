@@ -57,6 +57,7 @@ dp_install ()
     local lib=$(needir $(dp_root)/lib);
     :;
     ln -f ./README.md $(dp_root);
+    ln -f ./Changelog.md $(dp_root);    
     :;
     chmod 775 ./dp{,util}lib;
     ln -f ./dplib $bin;
