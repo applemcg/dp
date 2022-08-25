@@ -42,11 +42,12 @@ dp_funs ()
 }
 dp_init () 
 { 
-    : "bring along it's utillib";
+    : bring along its utillib;
     : date: 2022-08-20;
     : date: 2022-08-22;
     source $(which dputillib);
     isfunction dp_obsolete && dp_obsolete unset
+    dp_root
 }
 dp_install () 
 { 
@@ -76,7 +77,8 @@ dp_root ()
 { 
     : the development, think ~/src/... directory for source control;
     : date: 2022-08-22;
-    ${*:-echo} $(needir $HOME/Dropbox/marty3/git/dp)
+    : ${DP_ROOT:=$(needir $HOME/Dropbox/marty3/git/dp)}
+    ${*:-echo} $DP_ROOT
 }
 dp_test () 
 { 
@@ -97,7 +99,7 @@ dp_version ()
     : link to "(or echo)" the changelog and show the Version Number;
     : date: 2022-08-22;
     ${*:-open} https://applemcg.github.io/shelf.html#dp_Changelog;
-    comment 0.2.0
+    comment 0.3.0
 }
 dp_diff () 
 { 

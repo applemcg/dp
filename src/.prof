@@ -18,18 +18,24 @@ false &&
     ls -lisart .prof $(find . -type f | usefulfiles)
     set -- fun_peek; $1 .prof  $1
     dp_diff ; comment missing args
-}
-on
-off    
     # lib_tidy ./dplib
     # dp_install
     # source ./dplib;
     # foreach yy $(dp_all)
-    def compare_all_lib
+    # def compare_all_lib
+}
+
+#  ------------- this is where other maintenance utilities are invoked,	--
+#
+# e.g. "compare_all_lib" doesn't belong here, it's now part of the process,
+# and needs to find its way to  the dputillib
+
+on
+off    
     compare_all_lib
     # funslib $( do_whf $(fdp)| field 1)
-    dp_install
-    backup_ver $(dp_version)
+    # dp_install
+    # backup_ver $(dp_version)
     
 
 
