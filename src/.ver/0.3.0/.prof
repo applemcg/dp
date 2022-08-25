@@ -1,0 +1,35 @@
+source functionlib
+source dplib
+dp_version () 
+{ 
+    : link to "(or echo)" the changelog and show the Version Number;
+    : date: 2022-08-22;
+    ${*:-open} https://applemcg.github.io/shelf.html#dp_Changelog;
+    echo 0.3.0
+}
+
+false &&
+{
+    return;
+    dp_utilities | tee $(dp_utillib)
+    dp_install
+    which dputillib
+    backup .prof    
+    ls -lisart .prof $(find . -type f | usefulfiles)
+    set -- fun_peek; $1 .prof  $1
+    dp_diff ; comment missing args
+}
+on
+off    
+    # lib_tidy ./dplib
+    # dp_install
+    # source ./dplib;
+    # foreach yy $(dp_all)
+    def compare_all_lib
+    compare_all_lib
+    # funslib $( do_whf $(fdp)| field 1)
+    dp_install
+    backup_ver $(dp_version)
+    
+
+

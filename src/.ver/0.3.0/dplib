@@ -57,6 +57,7 @@ dp_install ()
     local lib=$(needir $(dp_root)/lib);
     :;
     ln -f ./README.md $(dp_root);
+    ln -f ./Changelog.md $(dp_root);
     :;
     chmod 775 ./dp{,util}lib;
     ln -f ./dplib $bin;
@@ -116,6 +117,19 @@ dp_diff ()
         diff .dlib .dotp 1>&2 || { 
             printf "RETURN $?\n< $lib\n$fun\t.prof\n========\n\n\n"
         };
+    done
+}
+dp_tolibrary () 
+{ 
+    : write dot prof functions to their primary directory;
+    : date: 2022-08-25;
+    local out=./funlib.out;
+    for dir in $(
+      do_whf $(fdp) | tee $out | nf gt 1 | field 2 | sort -u
+      );
+    do
+        lib=$(basename $dir);
+        funslib $(grep $lib $out| field 1);
     done
 }
 eval dp_init 1>&2

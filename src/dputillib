@@ -141,6 +141,32 @@ declare ()
         ;;
     esac
 }
+do_whf () 
+{ 
+    : fixed on date, eschewed the recursive call;
+    : todo: explore effect of "date" in abstract;
+    : date: 2020-05-01;
+    : date: 2021-03-24;
+    args=$*;
+    for fun in $args;
+    do
+        set -- $(whf $fun);
+        printf "%s\t%s\n" $fun "$*";
+    done
+}
+dp_tolibrary () 
+{ 
+    : write dot prof functions to their primary directory;
+    : date: 2022-08-25;
+    local out=./funlib.out;
+    for dir in $(
+      do_whf $(fdp) | tee $out | nf gt 1 | field 2 | sort -u
+      );
+    do
+        lib=$(basename $dir);
+        funslib $(grep $lib $out| field 1);
+    done
+}
 eachfunction () 
 { 
     : list everyfunction, including same function later in file, input;
@@ -285,12 +311,76 @@ func_args ()
 	$1 ~ /^[.a-zA-Z0-9][.a-zA-Z0-9_]*$/ { print $1 }
     '
 }
+func_get () 
+{ 
+    : update the list of libraries daily;
+    : 2020-06-10 test for non-existent or EMPTY file, add SMART cat;
+    : date: 2021-03-24 move data name to calling function;
+    : date: 2022-01-02;
+    : date: 2022-03-10;
+    debug ENTRY A "$@";
+    if_missingargs 1 "$*" && return 1;
+    file="$1";
+    shift;
+    [[ -s "$file" ]] || { 
+        debug CREATE $file;
+        function_libs | sort > "$file"
+    };
+    modified_today "$file" || { 
+        debug DAILY $file;
+        function_libs | sort > "$file"
+    };
+    cat "$file"
+}
+funclocn () 
+{ 
+    : return location of all function libraries;
+    : date: 2016-11-13;
+    : date: 2018-02-15 all HOME .profiles;
+    : date: 2021-03-24 -- Refresh with -r;
+    : date: 2022-01-02;
+    : date: 2022-03-17;
+    :;
+    debug A "$@";
+    file=$(lib)/$(myname).txt;
+    case $1 in 
+        -r)
+            rm -f "$file";
+            debug R $(wc -l "$file")
+        ;;
+        -*)
+            command declare -f funclocn;
+            return
+        ;;
+    esac;
+    debug file: $(wc -l "$file");
+    func_get "$file"
+}
+function_libs () 
+{ 
+    : -------------------------- files named ...LIB in a /BIN directory --;
+    :;
+    find $(home) -type f -name '*[a-zA-Z]lib' 2> /dev/null | grep /bin/ | grep -v '/\.[a-z]'
+}
 functions () 
 { 
     : list functions ONCE in order of occurrence;
     : due to historical precendence;
     : lesson: time spent by not using PRINTFIRST,;
     eachfunction $* | awk '!p[$1]++'
+}
+funslib () 
+{ 
+    : save functions in a TBD library. try WHF;
+    : usage: ~ funca ...;
+    : relies on the fact that an unset LIBNAME defaults to FUNCTIONLIB;
+    : date: 2018-12-01;
+    : date: 2021-12-06;
+    : date: 2022-04-09;
+    : date: 2022-06-03;
+    if_missingargs 1 $* && return 1;
+    local libname=$(whf $1);
+    libfuns ${libname:-$(which functionlib)} $*
 }
 home () 
 { 
@@ -333,6 +423,24 @@ lib ()
     : date: 2022-02-23;
     ${*:-echo} $(home)/lib
 }
+modified_today () 
+{ 
+    : was the FILE argument MODIFIED TODAY?;
+    : date: 2020-01-05;
+    : date: 2020-02-08;
+    : date: 2021-05-15;
+    : date: 2022-01-02;
+    if_missingargs 1 $* && return;
+    report_notfile $1 && return 1;
+    function _modified_day () 
+    { 
+        set -- $(stat -t %d "$1");
+        read_devtty mtime: ${10};
+        echo ${10:1:2}
+    };
+    set -- $(_modified_day $1) $(date +%d);
+    [[ $1 == $2 ]]
+}
 myname () 
 { 
     : e.g. myname "[n, default 1]";
@@ -355,6 +463,43 @@ needir ()
     [[ -d "$1" ]] || mkdir -p "$1";
     echo "$1"
 }
+nf () 
+{ 
+    : date: 2017-05-11;
+    : date: 2017-07-18;
+    case $1 in 
+        *awk)
+            AWK=$1;
+            shift
+        ;;
+        *)
+            AWK=$( which gawk || which nawk || which awk )
+        ;;
+    esac;
+    case $1 in 
+        lt)
+            $AWK "NF < ${2:-5}"
+        ;;
+        gt)
+            $AWK "NF > ${2:-1}"
+        ;;
+        eq)
+            $AWK "NF == ${2:-5}"
+        ;;
+        ne)
+            $AWK "NF != ${2:-5}"
+        ;;
+        help)
+            comment $0 "[lt|gt|eq|ne||* [NN]]"
+        ;;
+        "")
+            $AWK NF
+        ;;
+        *)
+            $AWK '{ print NF, $0}'
+        ;;
+    esac
+}
 pause () 
 { 
     return
@@ -368,6 +513,10 @@ rdb_hdr ()
     : date: 2022-05-29;
     ( echo $*;
     echo $* | tr 'a-zA-Z0-9_' '-' ) | sed 's/  */ /g' | tr ' ' '\t'
+}
+read_devtty () 
+{ 
+    return
 }
 reading () 
 { 
@@ -412,6 +561,32 @@ tpl ()
     : returns STDIN or NAMEd files as a Token Per Line;
     : date: 2020-11-14;
     cat ${*:--} | tr -s ' \t' '\n'
+}
+whf () 
+{ 
+    : Which library Has the Function;
+    : related: functions;
+    : date: 2016-11-11;
+    : date: 2017-07-16 supress localibs in funclocn -l;
+    : date: 2020-09-30;
+    : date: 2021-02-07 all internal, non _ function names;
+    : date: 2021-03-24;
+    : date: 2022-01-02;
+    local flag="";
+    case $1 in 
+        -*)
+            flag=-l;
+            shift
+        ;;
+    esac;
+    local arg=${1:-whf};
+    : rbx A "$arg";
+    funclocn $flag 2> /dev/null | while read file; do
+        : rbx B "$file";
+        awk -v patn="^$arg$" '
+    	$1 ~ patn && $2 ~ /^[(][)]$/ && !p[FILENAME]++ { print FILENAME }
+	' "$file";
+    done
 }
 wpl () 
 { 
