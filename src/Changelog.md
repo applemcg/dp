@@ -27,6 +27,7 @@ versioning with a github REPO.
   variable for the **dp_root**
 * incliude **dp_funs** in dp_example
 
+
 ### Deprecated
 
 * **dputillib** 
@@ -36,7 +37,7 @@ versioning with a github REPO.
 ### Security
 
 
-## [0.3.0] 2022-08-27
+## [0.3.0] 2022-08-28
 
 ### Added
 

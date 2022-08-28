@@ -111,8 +111,21 @@ has copies of recent statements from the **execution** block
         dp_version backup_ver 
         # ver_diff .ver/0.{2,3}.0
         dp_install
-    
+		
 The **execution** block may also have comments and likely have one or
 more executable statements.  For example, if "compare_all_lib" needs to
 be executed, simply delete the shell comment sharp (#).   This is where
 the functions may be unit tested.
+
+
+Versioning
+----------
+
+Not imposed by the DP tools, but use of **git** in a **Semantic Versioning**
+environment.   Co-ordinating git versions with the Semantic Version is not
+terribly challenging, but with the implementation I use, it may be necessary
+to return some functions to the Dot Prof for re-work before the current 
+version may be closed.
+
+See an adjacent **Versioning** paper.
+
