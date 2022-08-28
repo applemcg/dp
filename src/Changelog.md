@@ -15,10 +15,29 @@ versioning with a github REPO.
 
 ### Added
 
-* move README to DP_ROOT ( or lib/.. ? )
-* **dp_app** the complete DP application
-* add sub-function completion, i.e.  **dp_diff** adds **dp** //diff//,
-  etc . . .
+* add sub-function completion, i.e.  **dp_diff** adds **dp** //diff//, 
+  n.b. **fun_asapp** needs to handle
+** no arguments -- return to caller
+** not a function argument -- return matching args
+** default arg in parent.
+
+
+### Changed
+
+### Deprecated
+
+### Fixed
+
+### Security
+
+## [0.4.a] TBD
+
+### Added
+
+* *dp_app* FILE to complete DP application
+
+* Workflow.md
+* Versioning.md
 
 ### Changed
 
@@ -28,11 +47,17 @@ versioning with a github REPO.
 * incliude **dp_funs** in dp_example
 
 
+* **dp install** move README, Workflow, Versioning  to DP_ROOT 
+* **dp all** -- where names are added or removed
+
 ### Deprecated
 
-* **dputillib** 
+* *dputillib, dplib* FILES -- absorbed in dp_app
+* **dp_obsolete** function -- to render recent functions obsolete
 
 ### Fixed
+
+* **dp_funs** leaked without arguments 
 
 ### Security
 

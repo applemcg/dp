@@ -1,0 +1,81 @@
+source functionlib
+source dp_app
+dp_version () 
+{ 
+    : print the version;
+    : the SMART way, dp_version backup_ver;
+    : date: 2022-08-22;
+    : date: 2022-08-27;
+    ${*:-echo} 0.4.a
+}
+dp_install () 
+{ 
+    : move the run-time components into place;
+    : date: 2022-08-20;
+    : ------------------ two main components of an APPs BITMELD --;
+    : date: 2022-08-27;
+    :;
+    local bin=$(needir $(dp_root)/bin);
+    local lib=$(needir $(dp_root)/lib);
+    :;
+    : ---------------- install Readable Information in the ROOT --;
+    :;
+    ln -f ./README.md $(dp_root);
+    ln -f ./Changelog.md $(dp_root);
+    ln -f ./Workflow.md $(dp_root);
+    ln -f ./Versioning.md $(dp_root);        
+    :;
+    : ---------------------------------- manufacture the dp_app	--;
+    :;
+    dp_utilities | cat - ./dplib | onlyChanged dp_app
+    :;
+    : ------------------- install the function libraries in BIN --;
+    :;
+    chmod 775 ./dp_app
+    ln -f ./dp_app $bin;
+    :;
+    : ------------------------------- install text files in LIB --;
+    ln -f ./dot.prof $lib;
+    :;
+    : ------------------------------------------- all installed --;
+    :;
+    indir $(dp_root) find . -type file | egrep -v '\.(bak|git)/'
+}
+dp_all () 
+{ 
+    : all the functions in the DP family;
+    : date: 2022-08-22;
+    ${*:-echo} dp dp_{abstracts,all,diff,example,funs,init,install,profs,root,test,tolibrary,utilities,version}
+}
+false &&
+{
+	return;
+	# see Workflow.md
+## Steps
+
+1. qf dp_version; update to x.\(N+1\).a, read into .prof
+1. edit Changelog, to reflect version, making space for Unreleased
+1. comment, ordered list "just a number", successive "1"s make sense
+1. pick a function to add to .prof.  lets add **dp_app**, 0.4.x
+  1. most affected function, **dp_install**, start there.
+  1. idiom:   qf *functionname*, in editor, read .qf into buffer
+  1. test dp_install here in the .prof
+1. another function, dp_all
+1. test
+1. git ls-files, git status
+1. fix compare_all_lib
+}        
+on
+    set -- dp_all
+    def $1
+    eval $1
+off        
+    # compare_all_lib
+    # backup_ver $(dp_version)
+    # dp_install
+    # ls -al .. ../{bin,lib}
+    # unset $(functions ../bin/dp{,util}lib})
+    # source dp_app
+    git ls-files, git status
+    # functions $(which dp_app)
+

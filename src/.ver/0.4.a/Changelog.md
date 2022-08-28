@@ -15,74 +15,40 @@ versioning with a github REPO.
 
 ### Added
 
-* add sub-function completion, i.e.  **dp_diff** adds **dp** //diff//, 
-  n.b. **fun_asapp** needs to handle
-** no arguments -- return to caller
-** not a function argument -- return matching args
-** default arg in parent.
-
-
-### Changed
-
-### Deprecated
-
-### Fixed
-
-### Security
-
-## [0.4.a] TBD
-
-### Added
-
-* *dp_app* FILE to complete DP application
-
-* Workflow.md
-* Versioning.md
+* **dp_app** the complete DP application
+* add sub-function completion, i.e.  **dp_diff** adds **dp** //diff//,
+  etc . . .
 
 ### Changed
 
 * Move Changelog from shelf.html to Changelog.md
 * **dp_install** accept a name, either user_input or ENVIRONMENT
   variable for the **dp_root**
-* incliude **dp_funs** in dp_example
-
-
-* **dp install** move README, Workflow, Versioning  to DP_ROOT 
-* **dp all** -- where names are added or removed
 
 ### Deprecated
 
-* *dputillib, dplib* FILES -- absorbed in dp_app
-* **dp_obsolete** function -- to render recent functions obsolete
+* **dputillib** and **dplib**
 
 ### Fixed
-
-* **dp_funs** leaked without arguments 
 
 ### Security
 
 
-## [0.3.0] 2022-08-28
+## [0.3.0] 2022-08-26
 
 ### Added
 
 * audit feature to assure sufficient, dputillib anticipating dp_app
 * function **util_fmlib**, awaits development utilities release
-* sub-functions
-** dp diff -- the difference between .prof and library function instance
-** dp tolibrary -- writes dot prof functions to primary library
-
 
 ### Changed
 
 * dp_abstracts complete, up to date
 * properly install README from ./src,
-* **dp_version** is now smart, default echo Version number
-* **dp_root** has a default ENVIRONMENT Variable:  DP_ROOT, to locate installation
 
 ### Fixed
 
-* dputillib audited for completeness, built during dp_install
+* dputillib audited for completeness
 * added README.md to SRC, install in parent
 
 ## [0.2.0]  2022-08-21

@@ -1,12 +1,134 @@
-source functionlib
-source dplib
-
+source functionlib 2> /dev/null
+source dp_app 2> /dev/null
+dp_version () 
+{ 
+    : print the version;
+    : the SMART way, dp_version backup_ver;
+    : date: 2022-08-22;
+    : date: 2022-08-27;
+    ${*:-echo} 0.4.a
+}
+dp_funs () 
+{ 
+    : list all function and their Dot Prof file;
+    : date: 2022-07-30;
+    : date: 2022-08-19;
+    if_missingargs 1 $* && return
+    functions $1 | sed "s=$=	$1="
+}
+dp_install () 
+{ 
+    : move the run-time components into place;
+    : date: 2022-08-20;
+    : ------------------ two main components of an APPs BITMELD --;
+    : date: 2022-08-27;
+    :;
+    local bin=$(needir $(dp_root)/bin);
+    local lib=$(needir $(dp_root)/lib);
+    :;
+    : ---------------- install Readable Information in the ROOT --;
+    :;
+    ln -f ./README.md $(dp_root);
+    ln -f ./Changelog.md $(dp_root);
+    ln -f ./Workflow.md $(dp_root);
+    ln -f ./Versioning.md $(dp_root);        
+    :;
+    : ---------------------------------- manufacture the dp_app	--;
+    :;
+    dp_utilities | cat - ./dplib | onlyChanged dp_app
+    :;
+    : ------------------- install the function libraries in BIN --;
+    :;
+    chmod 775 ./dp_app
+    ln -f ./dp_app $bin;
+    :;
+    : ------------------------------- install text files in LIB --;
+    ln -f ./dot.prof $lib;
+    :;
+    : ------------------------------------------- all installed --;
+    :;
+    indir $(dp_root) find . -type file | egrep -v '\.(bak|git)/'
+}
+dp_all () 
+{ 
+    : all the functions in the DP family;
+    : date: 2022-08-22;
+    ${*:-echo} dp dp_{abstracts,all,diff,example,funs,init,install,profs,root,test,tolibrary,utilities,version}
+}
+dp () 
+{ 
+    : do Dot Prof;
+    : date: 2022-08-19;
+    : date: 2022-08-22;
+    [[ -f ./.prof ]] || { 
+        cp $(dp_root)/lib/dot.prof .prof
+    };
+    isfunction backup 2>/dev/null && backup .prof
+    set ${1:-.prof}
+    case $1 in
+    .prof ) source $1;;
+    * )     fun_asapp $* && return;;
+    esac
+}
+fun_asapp () 
+{ 
+    : smart family main function, checks to see if ARG is a sub-function;
+    : usage: fun_asapp args ... And return;
+    : date: 2022-04-09;
+    debug ENTRY $# $*;
+    [[ $# -lt 1 ]] && { 
+        debug ZERO Args;
+        return 1
+    };
+    local caller=$(myname 2);
+    local subfun=$1;
+    local famfun=${caller}_$subfun;
+    debug famfun: $famfun;
+    pause;
+    isfunction $famfun && { 
+        shift;
+        fun_subuse $caller $subfun;
+        debug FUNCTION famfun $famfun;
+        $famfun $*;
+        return
+    };
+    debug NOT a Function $famfun;
+    sfg ${caller}_ 1>&2
+    return 2
+}
 false &&
 {
 	return;
-	# see Workflow.md 
+	# see Workflow.md
+## Steps
+
+# 1. qf dp_version; update to x.\(N+1\).a, read into .prof
+# 1. edit Changelog, to reflect version, making space for Unreleased
+# 1. comment, ordered list "just a number", successive "1"s make sense
+# 1. pick a function to add to .prof.  lets add **dp_app**, 0.4.x
+#   1. most affected function, **dp_install**, start there.
+#   1. idiom:   qf *functionname*, in editor, read .qf into buffer
+#   1. test dp_install here in the .prof
+# 1. another function, dp_all
+# 1. test
+# 1. git ls-files, git status
+# 1. no NEED to fix compare_all_lib
+# 1. add **fun_asapp** to **dp**, test
 }        
-on
-	compare_all_lib
-        # backup_ver $(dp_version)
-off
+# # on
+# # off        
+#     # compare_all_lib
+#     # backup_ver $(dp_version)
+#     # dp_install
+    # ls -al .. ../{bin,lib}
+    # unset $(functions ../bin/dp{,util}lib})
+    # source dp_app
+    # git ls-files, git status
+    # functions $(which dp_app)
+    # test FUN_ASAPP
+    def dp;
+    dp abstracts | j
+    # dp help
+
+
+
