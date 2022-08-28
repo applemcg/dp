@@ -115,4 +115,4 @@ has copies of recent statements from the **execution** block
 The **execution** block may also have comments and likely have one or
 more executable statements.  For example, if "compare_all_lib" needs to
 be executed, simply delete the shell comment sharp (#).   This is where
-the functions under test may be
+the functions may be unit tested.
