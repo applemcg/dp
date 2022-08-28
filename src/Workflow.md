@@ -19,8 +19,8 @@ Format of the Dot Prof file
 
 The .prof file will have four sections in the order here:
 
-- the header, sourceing librarys
-- function bodies, new and those being repaird
+- the header, sourcing libraries
+- function bodies, new and those being repaired
 - a comment block in the **false && { ... }** 
 - the execution steps, which may be themselves commented 
 
@@ -30,14 +30,16 @@ Executing the Dot Prof
 	dp   # or manually,
 	source ./.prof
 	
-where the **dp** function also, one might say "gratuitiously" backs up a
+where the **dp** function also, one might say "gratuitously" backs up a
 changed .prof file.
 
 Save .prof Functions in the Appropriate Library
 -----------------------------------------------
 
-Desination libs, local and non- are idenfied with this command which returns
-function - library pairs.  A new function will not have a library name paired.
+Libraries are either local (under development) or non-local (existing
+libraries on the PATH) are identified with this command which returns
+function - library pairs.  A new function will not have a paired
+library name.
 
      do_whf $(fdp)
 	
@@ -63,7 +65,7 @@ For new .prof functions (not yet in a library) using the family name, i.e. dp_
 	
 For new utility functions, not for the local lib
 
-    libfuns $(which {UTILIY}lib) {fun}a {other}b ...
+    libfuns $(which {UTILITY}lib) {fun}a {other}b ...
 	
 For the default library -- functionlib, a function with no home:
 
@@ -74,8 +76,41 @@ For the default library -- functionlib, a function with no home:
 	:
 	funslib $(do_whf $(fdp) | field 1);	
 	
-### 	
+Execution Steps
+---------------
 
+This is why the Dot Prof workflow is useful.   The objective is to
+unit test the functions under development.   
 
+Here is a sample of the **comment** and **execution** blocks from
+a recent .prof.   The comment block, shielded by the **false** command
+has copies of recent statements from the **execution** block
 
-	
+    false &&
+    {
+        dp_utilities | tee $(dp_utillib)
+        dp_install
+        which dputillib
+
+        ls -lisart .prof $(find . -type f | usefulfiles)
+        set -- fun_peek; $1 .prof  $1
+        dp_diff ; comment missing args
+        # lib_tidy ./dplib
+        # def compare_all_lib
+    
+        #  ------------- this is where other maintenance utilities are invoked,	--
+        #
+        # 1). "compare_all_lib" doesn't belong here, it's now part of the process,
+    }
+        # compare_all_lib
+        # funslib $( do_whf $(fdp)| field 1)
+        # 
+        # backup_ver $(dp_version)
+        dp_version backup_ver 
+        # ver_diff .ver/0.{2,3}.0
+        dp_install
+    
+The **execution** block may also have comments and likely have one or
+more executable statements.  For example, if "compare_all_lib" needs to
+be executed, simply delete the shell comment sharp (#).   This is where
+the functions under test may be
