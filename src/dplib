@@ -21,7 +21,7 @@ dp_all ()
 { 
     : all the functions in the DP family;
     : date: 2022-08-22;
-    ${*:-echo} dp dp_{abstracts,all,diff,example,funs,init,install,obsolete,profs,root,test,utilities,version}
+    ${*:-echo} dp dp_{abstracts,all,diff,example,funs,init,install,obsolete,profs,root,test,tolibrary,utilities,version}
 }
 dp_example () 
 { 
@@ -46,7 +46,7 @@ dp_init ()
     : date: 2022-08-20;
     : date: 2022-08-22;
     source $(which dputillib);
-    isfunction dp_obsolete && dp_obsolete unset
+    isfunction dp_obsolete && dp_obsolete unset;
     dp_root
 }
 dp_install () 
@@ -54,17 +54,33 @@ dp_install ()
     : move the run-time components into place;
     : date: 2022-08-20;
     : date: 2022-08-22;
+    : ------------------ two main components of an APPs BITMELD --;
+    : date: 2022-08-27;
+    :;
     local bin=$(needir $(dp_root)/bin);
     local lib=$(needir $(dp_root)/lib);
     :;
+    : ---------------- install Readable Information in the ROOT --;
+    :;
     ln -f ./README.md $(dp_root);
     ln -f ./Changelog.md $(dp_root);
+    :;
+    : ------------------------------- manufacture the dputillib --;
+    :;
+    dp_utilities | onlyChanged dputillib;
+    :;
+    : ------------------- install the function libraries in BIN --;
     :;
     chmod 775 ./dp{,util}lib;
     ln -f ./dplib $bin;
     ln -f ./dputillib $bin;
     :;
-    ln -f ./dot.prof $lib
+    : ------------------------------- install text files in LIB --;
+    ln -f ./dot.prof $lib;
+    :;
+    : ------------------------------------------- all installed --;
+    :;
+    indir $(dp_root) find . -type file | egrep -v '\.(bak|git)/'
 }
 dp_profs () 
 { 
@@ -77,7 +93,7 @@ dp_root ()
 { 
     : the development, think ~/src/... directory for source control;
     : date: 2022-08-22;
-    : ${DP_ROOT:=$(needir $HOME/Dropbox/marty3/git/dp)}
+    : ${DP_ROOT:=$(needir $HOME/Dropbox/marty3/git/dp)};
     ${*:-echo} $DP_ROOT
 }
 dp_test () 
@@ -96,10 +112,11 @@ dp_utilities ()
 }
 dp_version () 
 { 
-    : link to "(or echo)" the changelog and show the Version Number;
+    : print the version;
+    : the SMART way, dp_version backup_ver;
     : date: 2022-08-22;
-    ${*:-open} https://applemcg.github.io/shelf.html#dp_Changelog;
-    comment 0.3.0
+    : date: 2022-08-27;
+    ${*:-echo} 0.3.0
 }
 dp_diff () 
 { 

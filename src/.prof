@@ -2,10 +2,56 @@ source functionlib
 source dplib
 dp_version () 
 { 
-    : link to "(or echo)" the changelog and show the Version Number;
+    : print the version #, i.e.  backup_ver '$(dp_version)'
+    : the SMART way, dp_version backup_ver
     : date: 2022-08-22;
-    ${*:-open} https://applemcg.github.io/shelf.html#dp_Changelog;
-    echo 0.3.0
+    ${*:-echo} 0.3.0
+}
+dp_install () 
+{ 
+    : move the run-time components into place;
+    : date: 2022-08-20;
+    : date: 2022-08-22;
+    : ------------------ two main components of an APPs BITMELD	--
+    :
+    local bin=$(needir $(dp_root)/bin);
+    local lib=$(needir $(dp_root)/lib);
+    :
+    : ---------------- install Readable Information in the ROOT	--
+    :
+    ln -f ./README.md $(dp_root);
+    ln -f ./Changelog.md $(dp_root);
+    :;
+    : ------------------------------- manufacture the dputillib	--
+    :
+    dp_utilities | onlyChanged dputillib
+    :
+    : ------------------- install the function libraries in BIN	--
+    :
+    chmod 775 ./dp{,util}lib;
+    ln -f ./dplib $bin;
+    ln -f ./dputillib $bin;
+    :;
+    : ------------------------------- install text files in LIB	--    
+    ln -f ./dot.prof $lib
+    :
+    : ------------------------------------------- all installed	--
+    :
+    indir $(dp_root) find . -type file | egrep -v '\.(bak|git)/'
+}
+ver_diff () 
+{ 
+    : DIFF the files between versions;
+    if_missingargs 2 $* && return;
+    report_notdirectory $1 && return 1
+    debug ENTRY $d*
+    for f in $(foreach namedfile $(ls  $1/*));
+    do
+        g=$2/$(basename $f);
+	debug F: $f G: $g; pause
+        diff $f $g;
+        printf "< $f\n> $g\n\t==========\n";
+    done | grep -v date:
 }
 
 false &&
@@ -21,21 +67,59 @@ false &&
     # lib_tidy ./dplib
     # dp_install
     # source ./dplib;
-    # foreach yy $(dp_all)
+    # foreach dp_diff  $(dp_all)
     # def compare_all_lib
-}
 
-#  ------------- this is where other maintenance utilities are invoked,	--
-#
-# e.g. "compare_all_lib" doesn't belong here, it's now part of the process,
-# and needs to find its way to  the dputillib
-
-on
-off    
+    #  ------------- this is where other maintenance utilities are invoked,	--
+    #
+    # 1). "compare_all_lib" doesn't belong here, it's now part of the process,
+    # and needs to find its way to  the dputillib
+    #
+    # ---------- develop testing, verification, installation, versionin process	--
+    #
+    dop
+    dp
     compare_all_lib
-    # funslib $( do_whf $(fdp)| field 1)
-    # dp_install
-    # backup_ver $(dp_version)
-    
-
-
+    compare_all_lib abstract
+    abstract compare_all_lib
+    ver_dif
+    ver_diff
+    indir .ver ver_diff 0.{2,3}.0
+    indir .ver ver_diff 0.{2,3}.0 | more
+    abstract dp_diff
+    def  abstract dp_diff
+    dp_diff dplib $(fdp)
+    dp_diff dplib $(fdp) | more
+    do_whf $(fdp)
+    funlib
+    funslib ver_diff
+    do_whf $(fdp)
+    do_whf $(fdp) | grep dplib | field 1
+    funslib $(do_whf $(fdp) | grep dplib | field 1)
+    greph ver_diff
+    dp_install
+    ver_diff .ver/0.{2,3}.0
+    ver_diff .ver/0.{2,3}.0 |  more
+    def  ver_diff 
+    funslib $(do_whf $(fdp) | grep dplib | field 1)
+    * 
+    funslib $(do_whf $(fdp) | grep dplib | field 1)
+    lib_tidy dplib
+    eachfunction $(which utillib)  | sort | uniq -c | awk '$1 > 1'
+    eachfunction ./dplib
+    source ./dplib
+    shd_latest $(functions ./dplib)
+    shd_latest $(functions ./dplib) | sort
+    dp_abstracts
+    dp_abstracts | j
+    dp_funs
+    def dp_funs
+    fuse dp_funs
+    dp_example
+    dp_install
+}        
+on
+	# compare_all_lib
+	# funslib $( do_whf $(fdp)| field 1)
+        # backup_ver $(dp_version)
+off

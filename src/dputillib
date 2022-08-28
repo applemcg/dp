@@ -104,14 +104,6 @@ backup_one ()
     report_notfile "${1:-/dev/null}" && return 1;
     indir $(dirname $1) backup_here $(basename $1)
 }
-comment () 
-{ 
-    : since the DECLARE -F idiom eats;
-    : date: 2018-02-16;
-    : date: 2021-03-24;
-    : date: 2022-04-29;
-    echo $* 1>&2
-}
 debug () 
 { 
     return
@@ -152,19 +144,6 @@ do_whf ()
     do
         set -- $(whf $fun);
         printf "%s\t%s\n" $fun "$*";
-    done
-}
-dp_tolibrary () 
-{ 
-    : write dot prof functions to their primary directory;
-    : date: 2022-08-25;
-    local out=./funlib.out;
-    for dir in $(
-      do_whf $(fdp) | tee $out | nf gt 1 | field 2 | sort -u
-      );
-    do
-        lib=$(basename $dir);
-        funslib $(grep $lib $out| field 1);
     done
 }
 eachfunction () 
@@ -407,6 +386,26 @@ if_missingargs ()
     declare -f $(myname 2);
     return
 }
+indir () 
+{ 
+    : date: 2017-05-29;
+    : date: 2018-10-09;
+    : debug $*;
+    : date: 2021-12-06;
+    : date: 2022-05-03;
+    : lesson: any PUSH, POP, CDX may leave nothing on STDOUT.;
+    : date: 2022-05-07;
+    report_notdirectory $1 && return 1;
+    debug ENTRY $*;
+    local dir=$1;
+    shift;
+    pushd $dir > /dev/null;
+    debug EVAL $*;
+    pause;
+    eval ${@};
+    pushd 1>&2 > /dev/null;
+    cdx > /dev/null
+}
 isfunction () 
 { 
     : ~ function;
@@ -499,6 +498,23 @@ nf ()
             $AWK '{ print NF, $0}'
         ;;
     esac
+}
+onlyChanged () 
+{ 
+    : overwrites file arg if PIPEd data is different.;
+    : date: 2017-05-12;
+    : date: 2018-08-19;
+    : date: 2021-02-06 use HOME/tmp;
+    : date: 2021-03-24;
+    : date: 2022-01-08;
+    : date: 2022-08-02;
+    report_notpipe && return 1;
+    report_notargcount 1 $# && return 2;
+    : TARGET, TMPfile;
+    set $1 $(needir ~/tmp)/$(basename $1);
+    cat - > $2;
+    exists $1 || touch $1;
+    cmp $1 $2 > /dev/null && rm -f $2 || mv $2 $1
 }
 pause () 
 { 

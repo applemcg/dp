@@ -34,7 +34,7 @@ versioning with a github REPO.
 ### Security
 
 
-## [0.3.0] Pending
+## [0.3.0] 2022-08-26
 
 ### Added
 

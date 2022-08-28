@@ -15,6 +15,7 @@ versioning with a github REPO.
 
 ### Added
 
+* move README to DP_ROOT ( or lib/.. ? )
 * **dp_app** the complete DP application
 * add sub-function completion, i.e.  **dp_diff** adds **dp** //diff//,
   etc . . .
@@ -24,31 +25,38 @@ versioning with a github REPO.
 * Move Changelog from shelf.html to Changelog.md
 * **dp_install** accept a name, either user_input or ENVIRONMENT
   variable for the **dp_root**
+* incliude **dp_funs** in dp_example
 
 ### Deprecated
 
-* **dputillib** and **dplib**
+* **dputillib** 
 
 ### Fixed
 
 ### Security
 
 
-## [0.3.0] Pending
+## [0.3.0] 2022-08-27
 
 ### Added
 
 * audit feature to assure sufficient, dputillib anticipating dp_app
 * function **util_fmlib**, awaits development utilities release
+* sub-functions
+** dp diff -- the difference between .prof and library function instance
+** dp tolibrary -- writes dot prof functions to primary library
+
 
 ### Changed
 
 * dp_abstracts complete, up to date
 * properly install README from ./src,
+* **dp_version** is now smart, default echo Version number
+* **dp_root** has a default ENVIRONMENT Variable:  DP_ROOT, to locate installation
 
 ### Fixed
 
-* dputillib audited for completeness
+* dputillib audited for completeness, built during dp_install
 * added README.md to SRC, install in parent
 
 ## [0.2.0]  2022-08-21
