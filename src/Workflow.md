@@ -86,6 +86,7 @@ Here is a sample of the **comment** and **execution** blocks from
 a recent .prof.   The comment block, shielded by the **false** command
 has copies of recent statements from the **execution** block
 
+    # ------------------------------------------- COMMENT BLOCK	--
     false &&
     {
         dp_utilities | tee $(dp_utillib)
@@ -102,6 +103,7 @@ has copies of recent statements from the **execution** block
         #
         # 1). "compare_all_lib" doesn't belong here, it's now part of the process,
     }
+    # --------------------------------------------- EXECUTION BLOCK	--	
         # compare_all_lib
         # funslib $( do_whf $(fdp)| field 1)
         # 
