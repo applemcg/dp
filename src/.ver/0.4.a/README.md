@@ -1,6 +1,39 @@
 
+Dot Prof README
+===============
 
-open https://applemcg.github.io/shelf.html#DotProf%20README
+This page models the manual page format, this for the Dot Prof tool
+kit.
 
-echo source README.md
+NAME
+====
 
+
+SYNOPSIS
+========
+
+DESCRIPTION
+===========
+
+OPTIONS
+=======
+
+FILES
+=====
+
+
+COMPONENTS
+==========
+
+EXAMPLES
+========
+
+
+BUGS
+====
+
+AUTHOR
+======
+
+SEE ALSO
+========
