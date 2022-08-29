@@ -34,7 +34,6 @@ versioning with a github REPO.
 ### Added
 
 * *dp_app* FILE to complete DP application
-
 * Workflow.md
 * Versioning.md
 

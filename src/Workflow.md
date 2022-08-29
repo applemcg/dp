@@ -117,6 +117,25 @@ more executable statements.  For example, if "compare_all_lib" needs to
 be executed, simply delete the shell comment sharp (#).   This is where
 the functions may be unit tested.
 
+Example Update
+--------------
+
+A list of steps for the next release. This assumes the versioning in use here.
+
+1. qf **dp_version**; update to x.\(N+1\).a, read it into .prof
+1. edit Changelog, to reflect version, making space for Unreleased
+1. comment, ordered list "just a number", successive "1"s make sense
+1. pick a function to add to .prof.  lets add **dp_app**, 0.4.x
+  1. most affected function, **dp_install**, start there.
+  1. idiom:   qf *functionname*, in editor, read .qf into buffer
+  1. test dp_install here in the .prof
+1. another function, dp_all
+1. test
+1. git ls-files, git status
+1. no NEED to fix compare_all_lib
+1. add **fun_asapp** to **dp**, test
+
+
 
 Versioning
 ----------
@@ -128,4 +147,27 @@ to return some functions to the Dot Prof for re-work before the current
 version may be closed.
 
 See an adjacent **Versioning** paper.
+
+Functions
+---------
+
+
+1. qf
+
+    qf () 
+    { 
+        : named show Quick Function ...;
+        : date: 2019-08-11;
+        : date: 2021-08-28;
+        declare -f ${*:-qf} | tee .qf
+    }
+
+1. code\_tomd
+
+    code\_tomd () 
+    { 
+        : prepare Functions for including in a Markdown;
+        : date: 2022-08-29;
+        declare -f $* | fourspaces | tee .qf | show_tmpclip
+    }
 
