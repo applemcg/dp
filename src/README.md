@@ -101,7 +101,9 @@ INSTALL
 * clone DP from github
 * pull dp
 * *optional* export DP_ROOT=/pick/a/source/directory
-* source bin/dp\_app
+* source bin/dp_app 
+
+BUGS
 ====
 
 AUTHOR
@@ -111,8 +113,3 @@ Marty McGowan: martymcgowan AT mit DOT alum DOT edu
 
 SEE ALSO
 ========
-
-* The Only Backup You'll Ever Need:
-   http://mcgowans.org/pubs/marty3/commonplace/software/backupfunction.html
-
-

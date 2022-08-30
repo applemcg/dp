@@ -240,6 +240,7 @@ fun_asapp ()
         return
     };
     debug NOT a Function $famfun;
+    sfg ${caller}_ 1>&2;
     return 2
 }
 fun_log () 
@@ -571,6 +572,13 @@ report_usage ()
     :;
     : esac;
     echo USAGE $caller: $* 1>&2
+}
+sfg () 
+{ 
+    : date: 2019-12-21 back to our roots, Set Functions Grep;
+    : date: 2021-04-14;
+    : date: 2022-08-02;
+    set | functions | grep "${@:-.}"
 }
 tpl () 
 { 
