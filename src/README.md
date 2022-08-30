@@ -101,9 +101,7 @@ INSTALL
 * clone DP from github
 * pull dp
 * *optional* export DP_ROOT=/pick/a/source/directory
-* source bin/dp_app 
-
-BUGS
+* source bin/dp\_app
 ====
 
 AUTHOR
