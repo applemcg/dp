@@ -15,12 +15,11 @@ versioning with a github REPO.
 
 ### Added
 
-* add sub-function completion, i.e.  **dp_diff** adds **dp** //diff//, 
+* add sub-function completion, i.e.  *dp_diff* adds *dp diff*, 
   n.b. **fun_asapp** needs to handle
-** no arguments -- return to caller
-** not a function argument -- return matching args
-** default arg in parent.
-
+  * no arguments -- return to caller
+  * not a function argument -- return matching args
+  * default arg in parent.
 
 ### Changed
 
@@ -35,7 +34,6 @@ versioning with a github REPO.
 ### Added
 
 * *dp_app* FILE to complete DP application
-
 * Workflow.md
 * Versioning.md
 
