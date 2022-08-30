@@ -106,7 +106,7 @@ backup_one ()
 }
 debug () 
 { 
-    printf "%-21s\t%-21s\t%-21s : %s\n" ${FUNCNAME[3]} ${FUNCNAME[2]} ${FUNCNAME[1]} "$*" 1>&2
+    return
 }
 declare () 
 { 
@@ -518,8 +518,7 @@ onlyChanged ()
 }
 pause () 
 { 
-    local mapa=${FUNCNAME[1]};
-    read -p "[return] or {Ctrl-C}   ? " < /dev/tty
+    return
 }
 rdb_hdr () 
 { 
