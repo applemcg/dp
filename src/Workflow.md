@@ -9,19 +9,19 @@ the all functions to their respective library, either a local one
 under development or an existing library. 
 
 Since this development uses **Semantic Versioning**, see the
-accompanying **Changelog** for additional steps in the
-workflow. Nothing in this workflow requires Changelog or Semantic
-Versioning features. The function library and enclosing App may be
-used without reference to those practices.
+accompanying **Changelog** for additional steps in the workflow. This
+workflow separates requirements Changelog or Semantic Versioning
+features. The resulting function library and enclosing App may be used
+without reference to those practices.
 
 Format of the Dot Prof file
 ---------------------------
 
 The .prof file will have four sections in the order here:
 
-- the header, sourcing libraries
+- a header which may source libraries and perform initialization
 - function bodies, new and those being repaired
-- a comment block in the **false && { ... }** 
+- comments in a block wrappend in **false && { ... }** 
 - the execution steps, which may be themselves commented 
 
 Executing the Dot Prof

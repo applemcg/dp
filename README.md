@@ -9,17 +9,17 @@ SYNOPSIS
 
 + source dp_app -- loads the DP functions
 + dp -- 
-++ first time: installs a **.prof** in the current directory
-++ subsequent: sources the .prof, executing user-defined commands in the file
+  + on first ues: installs a **.prof** in the current directory
+  + subsequent: sources the .prof, executing user-defined commands in the file
 + dp _subfunction_ see the list of options
 
 DESCRIPTION
 ===========
 
-Manage and execute a **.prof** function.
+Manage and execute a **.prof** file.
 
 A developer's  main use is editing shell functions into the .prof file and
-test them with commands later in the file.   See the **Workflow** paper
+test them with commands later in the file.  See the companion **Workflow** paper
 
 OPTIONS
 =======
@@ -62,7 +62,7 @@ The most used command. Part of a iterative developement cycle
 
     dp
 	.. user inspects results
-	.. fixes the dot prof functions, test execution code
+	.. updates, adds dot prof functions, test execution code
 	dp 
 	....
 	
@@ -82,7 +82,6 @@ EXAMPLES
 ========
 
 ### dp example
-*
 
     dp_example () 
     { 
@@ -102,7 +101,7 @@ INSTALL
 * pull dp
 * *optional* export DP_ROOT=/pick/a/source/directory
 * source bin/dp\_app
-====
+
 
 AUTHOR
 ======
