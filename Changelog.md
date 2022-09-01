@@ -29,7 +29,7 @@ versioning with a github REPO.
 
 ### Security
 
-## [0.4.a] TBD
+## [0.4.b] TBD
 
 ### Added
 
@@ -44,9 +44,10 @@ versioning with a github REPO.
   variable for the **dp_root**
 * incliude **dp_funs** in dp_example
 
-
 * **dp install** move README, Workflow, Versioning  to DP_ROOT 
 * **dp all** -- where names are added or removed
+
+Moved versions from ./ver/x.y.z to ../version/x.y.z
 
 ### Deprecated
 
