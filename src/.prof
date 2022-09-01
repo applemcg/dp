@@ -73,6 +73,42 @@ dp ()
     * )     fun_asapp $* && return;;
     esac
 }
+dp_install () 
+{ 
+    : move the run-time components into place;
+    : versions are tracked in SRC, not in BIN, LIB
+    : date: 2022-08-20;
+    : ------------------ two main components of an APPs BITMELD --;
+    : date: 2022-08-27;
+    :;
+    local bin=$(needir $(dp_root)/bin);
+    local lib=$(needir $(dp_root)/lib);
+    :
+    runfrom $(dp_root)/src || return
+    :;
+    : ---------------- install Readable Information in the ROOT --;
+    :;
+    ln -f ./README.md $(dp_root);
+    ln -f ./Changelog.md $(dp_root);
+    ln -f ./Workflow.md $(dp_root);
+    ln -f ./Versioning.md $(dp_root);
+    :;
+    : ---------------------------------- manufacture the dp_app --;
+    :;
+    dp_utilities | cat - ./dplib | onlyChanged ./dp_app;
+    :;
+    : ------------------- install the function libraries in BIN --;
+    :;
+    chmod 775 ./dp_app;
+    ln -f ./dp_app $bin;
+    :;
+    : ------------------------------- install text files in LIB --;
+    ln -f ./dot.prof $lib;
+    :;
+    : ------------------------------------------- all installed --;
+    :;
+    indir $(dp_root) find . -type file | egrep -v '\.(bak|git)/'
+}
 fun_asapp () 
 { 
     : smart family main function, checks to see if ARG is a sub-function;
@@ -103,6 +139,10 @@ false &&
 {
 	return;
 	# see Workflow.md
+    mv .ver/* ../version
+    backup_ver 0.4.b
+    find ../version -type f
+
 }        
 # 
 # 
@@ -118,7 +158,4 @@ false &&
     # def dp;
     # dp abstracts | j
     # dp help
-on    
-    mv .ver/* ../version
-    backup_ver 0.4.b
-    find ../version -type f
+    dp install

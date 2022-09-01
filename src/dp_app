@@ -106,7 +106,7 @@ backup_one ()
 }
 debug () 
 { 
-    return
+    printf "%-21s\t%-21s\t%-21s : %s\n" ${FUNCNAME[3]} ${FUNCNAME[2]} ${FUNCNAME[1]} "$*" 1>&2
 }
 declare () 
 { 
@@ -519,7 +519,8 @@ onlyChanged ()
 }
 pause () 
 { 
-    return
+    local mapa=${FUNCNAME[1]};
+    read -p "[return] or {Ctrl-C}   ? " < /dev/tty
 }
 rdb_hdr () 
 { 
@@ -572,6 +573,33 @@ report_usage ()
     :;
     : esac;
     echo USAGE $caller: $* 1>&2
+}
+runfrom () 
+{ 
+    : usage: ~ DIRECTORY function args OR return;
+    : date: 2019-09-10;
+    : date: 2020-02-04 simplify, test using indir;
+    : read_devtty ENTERING: $PWD, $*;
+    : date: 2020-09-21;
+    : date: 2022-03-20;
+    : date: 2022-05-07;
+    : lesson: dont PAUSE in here, there are a few others, too;
+    : date: 2022-05-14;
+    debug ENTRY $*;
+    local ldir=$(indir $1 pwd);
+    debug testING PWD: $PWD, ldir: $ldir;
+    [[ $PWD = $ldir ]] && return;
+    debug HUNTING: $PWD, DIR: $1.;
+    pushd $1 > /dev/null;
+    shift;
+    local cmd=$(myname 2);
+    debug RUNNING: $PWD, cmd: $cmd, $#: $@;
+    $cmd $@;
+    debug HAVE RUN: $PWD, $#: $@;
+    pushd > /dev/null;
+    cdx 1>&2;
+    debug CLEARED: $PWD, $#: $@;
+    return 1
 }
 sfg () 
 { 

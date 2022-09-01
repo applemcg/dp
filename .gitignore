@@ -2,7 +2,7 @@
 # directories
 
 .bak
-.ver/20[2-4][0-9]*
+.ver
 bin
 lib
 
