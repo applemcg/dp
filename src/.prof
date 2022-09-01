@@ -1,5 +1,8 @@
 source functionlib 2> /dev/null
 source dp_app 2> /dev/null
+export USER_BACKUP_AREA=/git/
+export ALTERNATE_BACKUP_DIRS=".bak ../version"
+
 dp_version () 
 { 
     : print the version;
@@ -100,23 +103,9 @@ false &&
 {
 	return;
 	# see Workflow.md
-## Steps
-
-# 1. qf dp_version; update to x.\(N+1\).a, read into .prof
-# 1. edit Changelog, to reflect version, making space for Unreleased
-# 1. comment, ordered list "just a number", successive "1"s make sense
-# 1. pick a function to add to .prof.  lets add **dp_app**, 0.4.x
-#   1. most affected function, **dp_install**, start there.
-#   1. idiom:   qf *functionname*, in editor, read .qf into buffer
-#   1. test dp_install here in the .prof
-# 1. another function, dp_all
-# 1. test
-# 1. git ls-files, git status
-# 1. no NEED to fix compare_all_lib
-# 1. add **fun_asapp** to **dp**, test
 }        
-# # on
-# # off        
+# 
+# 
 #     # compare_all_lib
 #     # backup_ver $(dp_version)
 #     # dp_install
@@ -126,9 +115,10 @@ false &&
     # git ls-files, git status
     # functions $(which dp_app)
     # test FUN_ASAPP
-    def dp;
-    dp abstracts | j
+    # def dp;
+    # dp abstracts | j
     # dp help
-
-
-
+on    
+    mv .ver/* ../version
+    backup_ver 0.4.b
+    find ../version -type f
