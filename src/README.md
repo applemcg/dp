@@ -1,117 +1,73 @@
 
-NAME
-====
-
-+ dp -- Dot Prof
- 		
-SYNOPSIS
+Dot Prof
 ========
-
-+ source dp_app -- loads the DP functions
-+ dp -- 
-  + on first ues: installs a **.prof** in the current directory
-  + subsequent: sources the .prof, executing user-defined commands in the file
-+ dp _subfunction_ see the list of options
-
-DESCRIPTION
-===========
-
-Manage and execute a **.prof** file.
-
-A developer's  main use is editing shell functions into the .prof file and
-test them with commands later in the file.  See the companion **Workflow** paper
-
-OPTIONS
-=======
-The abstract table, produced by the *dp abstracts* command:
-
-    name        	abstract
-    ----        	--------
-    dp          	do Dot Prof
-    dp abstracts	write the Table for DP function ABSTRACTS
-    dp all      	all the functions in the DP family
-    dp diff     	diff LIB and .prof versions of functions
-    dp example  	dotprof usage examples
-    dp funs     	list all function and their Dot Prof file
-    dp init     	bring along its utillib
-    dp install  	move the run-time components into place
-    dp profs    	list the active Dot-Profs
-    dp root     	the development, think ~/src/... directory for source control
-    dp test     	home for DP testing, "it's shaping up in the FALSE block
-    dp tolibrary	write dot prof functions to their primary directory
-    dp utilities	functions used by dplib functions
-    dp version  	print the version
-
-
-FILES
-=====
-
-* **dplib** -- the function library of the DP family of functions
-* **dp_app** -- the DP application, sourced to load the functionality, containing
-   all the supporting (and otherwised undocumented) functions
-
-COMPONENTS
-==========
-
-Routinely used 
---------------
-
-### dp 
-
-The most used command. Part of a iterative developement cycle
-
-    dp
-	.. user inspects results
-	.. updates, adds dot prof functions, test execution code
-	dp 
-	....
 	
-### dp profs
+Dot Prof is a tool, shell function library, builit into a shell
+application. It is used for initial development, and appropriately in
+maintenance.  Since it was born to develop shell function libraries,
+its use in other language environments is an un-performed experiment,
+as yet.
 
-When there are more than one directory with a .prof, list the directories
-with .profs .
+Since some facets of the programming environment are local, the
+opening concept is extending the user's profile beyond the login
+profile into local **.prof** files
 
-With mulitple function librairies, a given function may, but rarely should
-be updated in more than one .prof.
+These documents describe the programmer's workflow at two levels, also
+provide a manual page format, and include a Changelog. This latter
+document brings with it a set or versioning requirements. 
 
-### dp funs
+It is worth saying the required rigor of the later steps in the
+development cycle is well-supported by the the method here. Unit tests
+are readily captured, and preserved in an evolving framework.
 
-Used with dp profs, lists each function in the directories with .prof files
-	
-EXAMPLES
-========
+The user installs Dot Prof:
 
-### dp example
++
++
++
++
 
-    dp_example () 
-    { 
-        : dotprof usage examples;
-        : date: 2022-08-19;
-        foreach dp_funs $(dp_profs) 1>&2;
-        echo . . . .;
-        foreach dp_funs $(dp_profs) | field 2 | sort -u;
-        echo . . . .;
-        declare -f $(myname)
-    }
+As delivered, the Dot Prof library, **dplib** supports the workflow
+here.  The addtional features levied by the versioning procedures are
+included in the Dot Prof App, **dp_app**.  That functionality comes
+from two function library sources at present, a **backuplib** and a
+generic utility library, **utillib**.  These are plannned as separate
+REPOs to be similarly built and promulgated.
 
-INSTALL
-=======
+Workflow
+--------
 
-* clone DP from github
-* pull dp
-* *optional* export DP_ROOT=/pick/a/source/directory
-* source bin/dp\_app
+The workflow introduces 
+
++ how and why a .prof file will be used
++ the file format of a .prof
++ its routine use in an iterative manner
++ example(s) workflows
++ interaction with versioning requiremnets
+
+Versioning
+----------
+
+Since this development has used **Semantic Versioning** the accompanying
+**Changelog** was maintained with software checkpoints to validate
+version to version changes.  This addition to the workflow separates
+requirements for Changelog and Semantic Versioning features. The
+resulting function library and enclosing App may be used without
+reference to those practices.
 
 
-AUTHOR
-======
+Manual Page
+-----------
 
-Marty McGowan: martymcgowan AT mit DOT alum DOT edu
+The Dot Prof interface is thru functions in the **dplib**  which
+are documented under the most often used **dp** function and 
+with its family of sub-functions, as **dp** *subfunction* 
 
-SEE ALSO
-========
 
-* The Only Backup You'll Ever Need:
-   http://mcgowans.org/pubs/marty3/commonplace/software/backupfunction.html
+Changelog
+---------
+
+Little more need be said of the Changelog. It's meets
+the requirements of **Semantic Versioning**, 
 
 

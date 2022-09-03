@@ -1,8 +1,8 @@
 source functionlib 2> /dev/null
-source dp_app 2> /dev/null
+source ./dp_app 2> /dev/null
+source ./dplib  2> /dev/null
 export USER_BACKUP_AREA=/git/
 export ALTERNATE_BACKUP_DIRS=".bak ../version"
-
 dp_version () 
 { 
     : print the version;
@@ -22,25 +22,29 @@ dp_funs ()
 dp_install () 
 { 
     : move the run-time components into place;
+    : versions are tracked in SRC, not in BIN, LIB    
     : date: 2022-08-20;
     : ------------------ two main components of an APPs BITMELD --;
     : date: 2022-08-27;
     :;
+    runfrom $(dp_root)/src || return
+    :
     local bin=$(needir $(dp_root)/bin);
     local lib=$(needir $(dp_root)/lib);
     :;
     : ---------------- install Readable Information in the ROOT --;
     :;
-    ln -f ./README.md $(dp_root);
-    ln -f ./Changelog.md $(dp_root);
-    ln -f ./Workflow.md $(dp_root);
+    ln -f ./README.md     $(dp_root);
+    ln -f ./Changelog.md  $(dp_root);
+    ln -f ./ManualPage.md $(dp_root);    
+    ln -f ./Workflow.md   $(dp_root);
     ln -f ./Versioning.md $(dp_root);        
     :;
     : ---------------------------------- manufacture the dp_app	--;
     :;
     dp_utilities | cat - ./dplib | onlyChanged dp_app
     :;
-    : ------------------- install the function libraries in BIN --;
+    : ------------------------- install just the APP in the BIN	--;
     :;
     chmod 775 ./dp_app
     ln -f ./dp_app $bin;
@@ -72,42 +76,6 @@ dp ()
     .prof ) source $1;;
     * )     fun_asapp $* && return;;
     esac
-}
-dp_install () 
-{ 
-    : move the run-time components into place;
-    : versions are tracked in SRC, not in BIN, LIB
-    : date: 2022-08-20;
-    : ------------------ two main components of an APPs BITMELD --;
-    : date: 2022-08-27;
-    :;
-    local bin=$(needir $(dp_root)/bin);
-    local lib=$(needir $(dp_root)/lib);
-    :
-    runfrom $(dp_root)/src || return
-    :;
-    : ---------------- install Readable Information in the ROOT --;
-    :;
-    ln -f ./README.md $(dp_root);
-    ln -f ./Changelog.md $(dp_root);
-    ln -f ./Workflow.md $(dp_root);
-    ln -f ./Versioning.md $(dp_root);
-    :;
-    : ---------------------------------- manufacture the dp_app --;
-    :;
-    dp_utilities | cat - ./dplib | onlyChanged ./dp_app;
-    :;
-    : ------------------- install the function libraries in BIN --;
-    :;
-    chmod 775 ./dp_app;
-    ln -f ./dp_app $bin;
-    :;
-    : ------------------------------- install text files in LIB --;
-    ln -f ./dot.prof $lib;
-    :;
-    : ------------------------------------------- all installed --;
-    :;
-    indir $(dp_root) find . -type file | egrep -v '\.(bak|git)/'
 }
 fun_asapp () 
 { 
@@ -142,7 +110,8 @@ false &&
     mv .ver/* ../version
     backup_ver 0.4.b
     find ../version -type f
-
+    echo . . . . . . .
+    ls -al .. ../{bin,lib}
 }        
 # 
 # 
@@ -158,4 +127,6 @@ false &&
     # def dp;
     # dp abstracts | j
     # dp help
-    dp install
+    # dp_install
+    echo . . . . . . .
+    sed -n '/false/,$p' .prof
