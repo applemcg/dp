@@ -103,6 +103,57 @@ fun_asapp ()
     sfg ${caller}_ 1>&2
     return 2
 }
+fuse () 
+{ 
+    : returns function context from client functions;
+    : named for Functions which USE ..;
+    : todo: ADD RULE to preserve only the report_NAME function NEEDS work!    
+    : todo: fix NAME=, ...;
+    : ...: replace temporary awk file with shell "<( .. )";
+    : ...: add trace and leave TMP files on STDERR;
+    : usage: $ fuse pattern file ...;
+    : ... $ { collect functions on stdin } PIPE fuse pattern;
+    : ... $ fuse pattern DEFAULTS to functions in current shell;
+    : date: 2017-03-07;
+    : date: 2019-04-24;
+    : date: 2021-03-09 the sed l,r Paren discovery needed G, global;
+    : date: 2022-02-25;
+    report_isfile $HOME/tmp && return 1
+    local tmp=$(needir $HOME/tmp)
+    local awk=$HOME/tmp/fuse.awk;
+    local patr="^-a-zA-Z0-9_";
+    local a="/[$patr$]$1[$patr\[\)=]/";
+    local b="/[$patr$]$1$/";
+    ( cat <<'EOF'
+        $2 ~ /^[(][)]$/  { f=$1; next; } 
+        $1 ~ /^:$/       { next; }
+	$1 ~ /^comment$/ { next; }
+	$1 ~ /^report_/  { print $1; next; }	
+EOF
+
+    printf '
+    f != ""  && ( %s || %s )     { printf "%%s\\t%%s\\n", f, $0 }\n
+    ' "$a" "$b" ) | tee $tmp/awk.tmp > $awk;
+    :;
+    : SED separates (...) into ( ... )
+    spaceit ${*:2} | sed 's/\([<$]\)(\([^)]*\))/\1( \2 )/g' | tee $tmp/fuse.tmp | awk -f $awk
+    llrt $tmp/{awk,fuse}.tmp 1>&2
+}
+compare_all_lib () 
+{ 
+    : compare set vs lib function lists;
+    : anticipates the general case;
+    : date: 2022-08-22;
+    if_missingargs 1 $* && return
+    local all=${$1}_all
+    local lib=./${1}lib
+    report_notfunction $all && return 1;
+    report_notfile $lib     && return 2;    
+    : 
+    $all | tpl > .all;
+    functions $ib | sort > .lib;
+    printf "%s\t%s\t%s\n" .all .lib BOTH
+}
 false &&
 {
 	return;
@@ -112,6 +163,19 @@ false &&
     find ../version -type f
     echo . . . . . . .
     ls -al .. ../{bin,lib}
+    # ---------------- inspect the versioning functions	--
+    #
+    def dp_version backup_ver
+    # ------------------------------ here is an example	--
+    #
+    dp_version backup_ver 2>&1
+
+    find $(dp_version backup_ver 2>&1)
+    # ----------------------------- show off the latest	--
+    #
+    ls -lrtd $(find $(dp_version backup_ver 2>&1))
+
+    sed -n '/false/,$p' .prof    
 }        
 # 
 # 
@@ -129,4 +193,6 @@ false &&
     # dp help
     # dp_install
     echo . . . . . . .
-    sed -n '/false/,$p' .prof
+    dp_utilities | awk '$2 ~ /[(][)]/ { fun = $1; } /reading/ { printf "%s\t%s\n", fun, $0 }'
+    
+

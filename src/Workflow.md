@@ -2,11 +2,25 @@
 Dot Prof Workflow
 =================
 
-Functions, *local* and non-local are entered in the .prof file, either
-new, or copies of existing functions which may need to be modified..
-In a source-controlled environment, the business here is to return
-the all functions to their respective library, either a local one
-under development or an existing library. 
+Functions, *local* and non-local are entered in the **.prof** file,
+either new functions, or copies of existing functions which may need
+to be modified.  In a source-controlled environment, the business here
+is to return the all functions to their respective library, either a
+local one under development or an existing library.
+
+The workflow here supports the idea that an Application is a set of
+functions, centered on a function library built to solve a specific
+set of tasks.  The user functions are collected in this library; they
+are supported by a heterogeneous group of functions, some or which are
+general utilities, many of which may come from other specific
+functional groups.  Specifically, in the case of the Dot Prof App,
+**dp\_app**, functions come from from a **backup** group and a
+**report** group. These later supply the Versioning features at a high
+level and the argument validation at a low level.
+
+This, the Dot Prof App is being put forward first, since it's the
+process which captures the workflow common to any such library 
+development.
 
 Since this development uses **Semantic Versioning**, see the
 accompanying **Changelog** for additional steps in the workflow. This
@@ -21,8 +35,10 @@ The .prof file will have four sections in the order here:
 
 - a header which may source libraries and perform initialization
 - function bodies, new and those being repaired
-- comments in a block wrappend in **false && { ... }** 
+- comments in a block wrapped in **false && { ... }** 
 - the execution steps, which may be themselves commented 
+
+See the Details of each section below, The Dot Prof Sections.
 
 Executing the Dot Prof
 ----------------------
@@ -76,15 +92,48 @@ For the default library -- functionlib, a function with no home:
 	:
 	funslib $(do_whf $(fdp) | field 1);	
 	
-Execution Steps
----------------
+The Dot Prof Sections
+---------------------
 
-This is why the Dot Prof workflow is useful.   The objective is to
-unit test the functions under development.   
+These are from a current **.prof**
 
-Here is a sample of the **comment** and **execution** blocks from
-a recent .prof.   The comment block, shielded by the **false** command
-has copies of recent statements from the **execution** block
+### the Header block
+
+The header block, much as a users .profile, collects features from the user's
+Environment, and sets variables particular to the development directory
+
+    source functionlib 2> /dev/null
+    source ./dp\_app 2> /dev/null
+    source ./dplib  2> /dev/null
+    export USER_BACKUP_AREA=/git/
+    export ALTERNATE_BACKUP_DIRS=".bak ../version"
+	
+The function libraries are "source"d from most to least general.
+
+1. the **functionlib** is my function warehouse, general purpose
+   functions, not in a family library. Though it's probably not
+   necessary, sourcing it here is a useful precaution. It's possible
+   some functions being updated in the Dot Prof may have their current
+   version in the functionlib library.  
+1. the **dp\_app** contains all the functions from the **dplib**, and those
+   from the functionlib used by the Dot Prof functions.  It is built during
+   the installation process.   
+1. the **dplib** is sourced after the companion APP since it updates functions
+   in the app during the install process.   As a result the hierarchy of 
+   operative function definitions being tested:
+   1. **.prof** definition is preferred over one in **dplib**, or any other
+   1. **dplib** definition is preferred over one in **dp\_app**, or any other
+   1. **dp\_app** definition is preferred over one in **functionlib**.
+   
+Also, similar to the user's .profile, a few enviroment variables may be assigned
+in the header block.  The usage here comes from my **backuplib**, documented in
+[The Only Backup You'll Ever Need](http://mcgowans.org/pubs/marty3/commonplace/software/backupfunction.html "backup")
+
+
+### Comment Block
+
+The comment block, shielded by the **false** command has copies of
+recent statements from the **execution** block
 
     # ------------------------------------------- COMMENT BLOCK	--
     false &&
@@ -103,6 +152,13 @@ has copies of recent statements from the **execution** block
         #
         # 1). "compare_all_lib" doesn't belong here, it's now part of the process,
     }
+	
+
+### Execution Block	
+
+This is why the Dot Prof workflow is useful. The objective is to unit
+test the functions under development.
+
     # --------------------------------------------- EXECUTION BLOCK	--	
         # compare_all_lib
         # funslib $( do_whf $(fdp)| field 1)
@@ -113,14 +169,15 @@ has copies of recent statements from the **execution** block
         dp_install
 		
 The **execution** block may also have comments and likely have one or
-more executable statements.  For example, if "compare_all_lib" needs to
-be executed, simply delete the shell comment sharp (#).   This is where
-the functions may be unit tested.
+more executable statements.  For example, if "compare_all_lib" needs
+to be executed, simply delete the shell comment sharp (#).  This is
+where the functions may be unit tested.
 
 Example Update
 --------------
 
-A list of steps for the next release. This assumes the versioning in use here.
+A sketchy list of steps for the next release. This assumes the
+versioning in use here. To be fleshed out before version 1.0.0
 
 1. qf **dp_version**; update to x.\(N+1\).a, read it into .prof
 1. edit Changelog, to reflect version, making space for Unreleased
@@ -130,9 +187,9 @@ A list of steps for the next release. This assumes the versioning in use here.
   1. idiom:   qf *functionname*, in editor, read .qf into buffer
   1. test dp_install here in the .prof
 1. another function, dp_all
+1. 
 1. test
 1. git ls-files, git status
-1. no NEED to fix compare_all_lib
 1. add **fun_asapp** to **dp**, test
 
 
@@ -141,12 +198,12 @@ Versioning
 ----------
 
 Not imposed by the DP tools, but use of **git** in a **Semantic Versioning**
-environment.   Co-ordinating git versions with the Semantic Version is not
+environment.   Coordinating git versions with the Semantic Version is not
 terribly challenging, but with the implementation I use, it may be necessary
 to return some functions to the Dot Prof for re-work before the current 
 version may be closed.
 
-See an adjacent **Versioning** paper.
+See the **Versioning** paper.
 
 Functions
 ---------
@@ -170,4 +227,25 @@ Functions
         : date: 2022-08-29;
         declare -f $* | fourspaces | tee .qf | show_tmpclip
     }
+
+1. compare\_all\_lib () 
+
+    compare\_all\_lib () 
+    { 
+        : compare set vs lib function lists;
+        : anticipates the general case;
+        : date: 2022-08-22;
+        local fam=${1:-dp};
+        ${fam}_all | tpl > .all;
+        functions ./${fam}lib | sort > .lib;
+        comm $* .all .lib;
+        printf "%s\t%s\t%s\n" .all .lib BOTH
+    }
+
+
+
+
+
+
+
 
