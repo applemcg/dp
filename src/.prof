@@ -1,8 +1,10 @@
 source functionlib 2> /dev/null
-source ./dp_app 2> /dev/null
-source ./dplib  2> /dev/null
+source ./dp_app    2> /dev/null
+source ./dplib     2> /dev/null
+source ./.fuse     2> /dev/null
 export USER_BACKUP_AREA=/git/
 export ALTERNATE_BACKUP_DIRS=".bak ../version"
+alias dpd='off; source ./.prof'
 dp_version () 
 { 
     : print the version;
@@ -16,37 +18,37 @@ dp_funs ()
     : list all function and their Dot Prof file;
     : date: 2022-07-30;
     : date: 2022-08-19;
-    if_missingargs 1 $* && return
+    if_missingargs 1 $* && return;
     functions $1 | sed "s=$=	$1="
 }
 dp_install () 
 { 
     : move the run-time components into place;
-    : versions are tracked in SRC, not in BIN, LIB    
+    : versions are tracked in SRC, not in BIN, LIB;
     : date: 2022-08-20;
     : ------------------ two main components of an APPs BITMELD --;
     : date: 2022-08-27;
     :;
-    runfrom $(dp_root)/src || return
-    :
+    runfrom $(dp_root)/src || return;
+    :;
     local bin=$(needir $(dp_root)/bin);
     local lib=$(needir $(dp_root)/lib);
     :;
     : ---------------- install Readable Information in the ROOT --;
     :;
-    ln -f ./README.md     $(dp_root);
-    ln -f ./Changelog.md  $(dp_root);
-    ln -f ./ManualPage.md $(dp_root);    
-    ln -f ./Workflow.md   $(dp_root);
-    ln -f ./Versioning.md $(dp_root);        
+    ln -f ./README.md $(dp_root);
+    ln -f ./Changelog.md $(dp_root);
+    ln -f ./ManualPage.md $(dp_root);
+    ln -f ./Workflow.md $(dp_root);
+    ln -f ./Versioning.md $(dp_root);
     :;
-    : ---------------------------------- manufacture the dp_app	--;
+    : ---------------------------------- manufacture the dp_app --;
     :;
-    dp_utilities | cat - ./dplib | onlyChanged dp_app
+    dp_utilities | cat - ./dplib | onlyChanged dp_app;
     :;
-    : ------------------------- install just the APP in the BIN	--;
+    : ------------------------- install just the APP in the BIN --;
     :;
-    chmod 775 ./dp_app
+    chmod 775 ./dp_app;
     ln -f ./dp_app $bin;
     :;
     : ------------------------------- install text files in LIB --;
@@ -60,7 +62,7 @@ dp_all ()
 { 
     : all the functions in the DP family;
     : date: 2022-08-22;
-    ${*:-echo} dp dp_{abstracts,all,diff,example,funs,init,install,profs,root,test,tolibrary,utilities,version}
+    ${*:-echo} dp dp_{abstracts,all,diff,example,funs,init,install} dp_{profs,root,test,tolibrary,utilities,version} dp_{cblock,compareall,functions,header,libraries} dp_{restore,rmfunctions}
 }
 dp () 
 { 
@@ -70,94 +72,107 @@ dp ()
     [[ -f ./.prof ]] || { 
         cp $(dp_root)/lib/dot.prof .prof
     };
-    isfunction backup 2>/dev/null && backup .prof
-    set ${1:-.prof}
-    case $1 in
-    .prof ) source $1;;
-    * )     fun_asapp $* && return;;
+    isfunction backup 2> /dev/null && backup ./.prof;
+    set ${1:-./.prof};
+    debug ENTRY $*;
+    case $1 in 
+        ./.prof)
+            source $1
+        ;;
+        *)
+            fun_asapp $* && return
+        ;;
     esac
 }
-fun_asapp () 
+dp_compareall () 
 { 
-    : smart family main function, checks to see if ARG is a sub-function;
-    : usage: fun_asapp args ... And return;
-    : date: 2022-04-09;
-    debug ENTRY $# $*;
-    [[ $# -lt 1 ]] && { 
-        debug ZERO Args;
-        return 1
-    };
-    local caller=$(myname 2);
-    local subfun=$1;
-    local famfun=${caller}_$subfun;
-    debug famfun: $famfun;
-    pause;
-    isfunction $famfun && { 
-        shift;
-        fun_subuse $caller $subfun;
-        debug FUNCTION famfun $famfun;
-        $famfun $*;
-        return
-    };
-    debug NOT a Function $famfun;
-    sfg ${caller}_ 1>&2
-    return 2
-}
-fuse () 
-{ 
-    : returns function context from client functions;
-    : named for Functions which USE ..;
-    : todo: ADD RULE to preserve only the report_NAME function NEEDS work!    
-    : todo: fix NAME=, ...;
-    : ...: replace temporary awk file with shell "<( .. )";
-    : ...: add trace and leave TMP files on STDERR;
-    : usage: $ fuse pattern file ...;
-    : ... $ { collect functions on stdin } PIPE fuse pattern;
-    : ... $ fuse pattern DEFAULTS to functions in current shell;
-    : date: 2017-03-07;
-    : date: 2019-04-24;
-    : date: 2021-03-09 the sed l,r Paren discovery needed G, global;
-    : date: 2022-02-25;
-    report_isfile $HOME/tmp && return 1
-    local tmp=$(needir $HOME/tmp)
-    local awk=$HOME/tmp/fuse.awk;
-    local patr="^-a-zA-Z0-9_";
-    local a="/[$patr$]$1[$patr\[\)=]/";
-    local b="/[$patr$]$1$/";
-    ( cat <<'EOF'
-        $2 ~ /^[(][)]$/  { f=$1; next; } 
-        $1 ~ /^:$/       { next; }
-	$1 ~ /^comment$/ { next; }
-	$1 ~ /^report_/  { print $1; next; }	
-EOF
-
-    printf '
-    f != ""  && ( %s || %s )     { printf "%%s\\t%%s\\n", f, $0 }\n
-    ' "$a" "$b" ) | tee $tmp/awk.tmp > $awk;
-    :;
-    : SED separates (...) into ( ... )
-    spaceit ${*:2} | sed 's/\([<$]\)(\([^)]*\))/\1( \2 )/g' | tee $tmp/fuse.tmp | awk -f $awk
-    llrt $tmp/{awk,fuse}.tmp 1>&2
-}
-compare_all_lib () 
-{ 
-    : compare set vs lib function lists;
+    : compare set vs family function lists;
     : anticipates the general case;
     : date: 2022-08-22;
-    if_missingargs 1 $* && return
-    local all=${$1}_all
-    local lib=./${1}lib
+    if_missingargs 1 $* && return;
+    local all=${1}_all;
+    local fam="$1 $(sfg ${1}_)";
+    debug all: $all;
+    debug fam: $fam;
     report_notfunction $all && return 1;
-    report_notfile $lib     && return 2;    
-    : 
-    $all | tpl > .all;
-    functions $ib | sort > .lib;
-    printf "%s\t%s\t%s\n" .all .lib BOTH
+    :;
+    $all | tpl | sort > .all;
+    echo $fam | tpl | sort > .fam;
+    comm .all .fam;
+    printf "%s\t%s\t%s\n" .all .fam BOTH
+}
+dp_diff () 
+{ 
+    : diff LIB and ./.prof versions of functions;
+    : lessons: ?? foreach was OK but Examine your TEST CASE, steady on DIFF ?;
+    : date: 2022-08-22;
+    debug ENTRY $# $*;
+    if_missingargs 2 $* && return;
+    local lib=$(which $1);
+    shift;
+    debug LIB: $lib;
+    for fun in $@;
+    do
+        debug FUN: $fun;
+        fun_peek $fun ./.prof > .dotp;
+        fun_peek $fun $lib > .dlib;
+        diff .dlib .dotp || { 
+            printf "RETURN $?\n< $lib\n$fun\t./.prof\n========\n\n\n"
+        };
+    done
+}
+dp_header () 
+{ 
+    : collect the current Header Block from ./.prof;
+    awk -v p=1 '$2 ~ /^[(][)]$/ { exit }; p' ${1:-./.prof}
+}
+dp_cblock () 
+{ 
+    : collect the current Comment and Execution Blocks from ./.prof;
+    awk -v p=0 '$1 ~ /^false$/ { p = 1 }; p' ${1:-./.prof}
+}
+dp_functions () 
+{ 
+    : collect the functions from ./.Prof;
+    awk -v p=0 '
+        $1 ~ /^false$/  { p = 0 };
+	$2 ~ /^[(][)]$/ { p = 1 };
+	p
+    ' ${1:-./.prof} | functions
+}
+dp_restore () 
+{ 
+    : collect the ./.prof functions in these versions:;
+    : .prof.now -- the current function block;
+    : .prof.nxt -- current less functions removed by rmfunctions;
+    : .prof.tmp -- the reconstructed .prof;
+    : related: dp_rmfunctions ./.prof.tmp into a .prof.nxt;
+    :;
+    function _do_restore () 
+    { 
+        dp_header;
+        declare -f $(dp_functions) > ./.prof.now;
+        [[ -f ./.prof.nxt ]] && cat ./.prof.nxt || cat ./.prof.now;
+        dp_cblock
+    };
+    _do_restore > ./.prof.tmp;
+    chmod +x  ./.prof.tmp;
+    comment set -- .prof.{now,nxt,tmp}
+}
+dp_rmfunctions () 
+{ 
+    : remove the named function arguments from the collection;
+    : update ./.prof.tmp;
+    if_missingargs 1 $* && return;
+    declare -f $(dp_functions | rm_these $*) | tee ./.prof.nxt
 }
 false &&
 {
 	return;
 	# see Workflow.md
+
+    see DOT fuse for "fuse"
+    
     mv .ver/* ../version
     backup_ver 0.4.b
     find ../version -type f
@@ -175,7 +190,14 @@ false &&
     #
     ls -lrtd $(find $(dp_version backup_ver 2>&1))
 
-    sed -n '/false/,$p' .prof    
+
+    # dp_utilities | awk '$2 ~ /[(][)]/ { fun = $1; } /reading/ { printf "%s\t%s\n", fun, $0 }'
+    
+    sed -n '/false/,$p' ./.prof
+
+    def compare_all_lib
+
+    dp install
 }        
 # 
 # 
@@ -193,6 +215,4 @@ false &&
     # dp help
     # dp_install
     echo . . . . . . .
-    dp_utilities | awk '$2 ~ /[(][)]/ { fun = $1; } /reading/ { printf "%s\t%s\n", fun, $0 }'
-    
-
+    def dp_{restore,rmfunctions}
