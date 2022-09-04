@@ -7,7 +7,7 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 To adhere with semantic versioning, let's see if I can merge my backup
-versioning with a github REPO.
+versioning with a GitHub REPO.
 
 ## [Unreleased]
 
@@ -15,13 +15,10 @@ versioning with a github REPO.
 
 ### Added
 
-* add sub-function completion, i.e.  *dp_diff* adds *dp diff*, 
-  n.b. **fun_asapp** needs to handle
-  * no arguments -- return to caller
-  * not a function argument -- return matching args
-  * default arg in parent.
-
 ### Changed
+
+* move dp/src/* to dp/*, simplifies **install**, also git feature and
+  compatible with **dfg** usage
 
 ### Deprecated
 
@@ -29,20 +26,22 @@ versioning with a github REPO.
 
 ### Security
 
-## [0.4.b] TBD
+## [0.4.0] TBD
 
 ### Added
 
 * *dp_app* FILE to complete DP application
 * Workflow.md
 * Versioning.md
+* dp Management Functions: dp {compareall,cblock,functions,header,libraries}
+  and dp {restore,rmfunctions}, deserving special notice for trimming the .prof
 
 ### Changed
 
 * Move Changelog from shelf.html to Changelog.md
 * **dp_install** accept a name, either user_input or ENVIRONMENT
   variable for the **dp_root**
-* incliude **dp_funs** in dp_example
+* include **dp_funs** in dp_example
 
 * **dp install** move README, Workflow, Versioning  to DP_ROOT 
 * **dp all** -- where names are added or removed
@@ -53,7 +52,7 @@ Moved versions from ./ver/x.y.z to ../version/x.y.z
 
 * *dputillib, dplib* FILES -- absorbed in dp_app
 * **dp_obsolete** function -- to render recent functions obsolete
-
+* **dp_diff**
 ### Fixed
 
 * **dp_funs** leaked without arguments 
