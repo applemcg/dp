@@ -104,6 +104,14 @@ backup_one ()
     report_notfile "${1:-/dev/null}" && return 1;
     indir $(dirname $1) backup_here $(basename $1)
 }
+comment () 
+{ 
+    : since the DECLARE -F idiom eats;
+    : date: 2018-02-16;
+    : date: 2021-03-24;
+    : date: 2022-04-29;
+    echo $* 1>&2
+}
 debug () 
 { 
     printf "%-21s\t%-21s\t%-21s : %s\n" ${FUNCNAME[3]} ${FUNCNAME[2]} ${FUNCNAME[1]} "$*" 1>&2
@@ -145,6 +153,68 @@ do_whf ()
         set -- $(whf $fun);
         printf "%s\t%s\n" $fun "$*";
     done
+}
+dp_cblock () 
+{ 
+    : collect the current Comment and Execution Blocks from ./.prof;
+    awk -v p=0 '$1 ~ /^false$/ { p = 1 }; p' ${1:-./.prof}
+}
+dp_compareall () 
+{ 
+    : compare set vs family function lists;
+    : anticipates the general case;
+    : date: 2022-08-22;
+    if_missingargs 1 $* && return;
+    local all=${1}_all;
+    local fam="$1 $(sfg ${1}_)";
+    debug all: $all;
+    debug fam: $fam;
+    report_notfunction $all && return 1;
+    :;
+    $all | tpl | sort > .all;
+    echo $fam | tpl | sort > .fam;
+    comm .all .fam;
+    printf "%s\t%s\t%s\n" .all .fam BOTH
+}
+dp_functions () 
+{ 
+    : collect the functions from ./.Prof;
+    awk -v p=0 '
+        $1 ~ /^false$/  { p = 0 };
+	$2 ~ /^[(][)]$/ { p = 1 };
+	p
+    ' ${1:-./.prof} | functions
+}
+dp_header () 
+{ 
+    : collect the current Header Block from ./.prof;
+    awk -v p=1 '$2 ~ /^[(][)]$/ { exit }; p' ${1:-./.prof}
+}
+dp_restore () 
+{ 
+    : collect the ./.prof functions in these versions:;
+    : .prof.now -- the current function block;
+    : .prof.nxt -- current less functions removed by rmfunctions;
+    : .prof.tmp -- the reconstructed .prof;
+    : related: dp_rmfunctions ./.prof.tmp into a .prof.nxt;
+    :;
+    function _do_restore () 
+    { 
+        dp_header;
+        declare -f $(dp_functions) > ./.prof.now;
+        [[ -f ./.prof.nxt ]] && cat ./.prof.nxt || cat ./.prof.now;
+        dp_cblock
+    };
+    _do_restore > ./.prof.tmp;
+    chmod +x ./.prof.tmp;
+    comment set -- .prof.{now,nxt,tmp}
+}
+dp_rmfunctions () 
+{ 
+    : remove the named function arguments from the collection;
+    : update ./.prof.tmp;
+    if_missingargs 1 $* && return;
+    declare -f $(dp_functions | rm_these $*) | tee ./.prof.nxt
 }
 eachfunction () 
 { 
@@ -222,6 +292,7 @@ fun_asapp ()
     : smart family main function, checks to see if ARG is a sub-function;
     : usage: fun_asapp args ... And return;
     : date: 2022-04-09;
+    : date: 2022-09-04;
     debug ENTRY $# $*;
     [[ $# -lt 1 ]] && { 
         debug ZERO Args;
@@ -552,6 +623,14 @@ report_notfile ()
     report_usage $1 "ISN'T" a file;
     declare -f $(myname 2) 1>&2
 }
+report_notfunction () 
+{ 
+    : returns: TRUE when 1st arg "ISN'T" a function,;
+    : ... FALSE if it IS a function;
+    : date: 2018-02-16;
+    declare -f $1 > /dev/null && return 1;
+    report_usage $1 "ISN'T" a function
+}
 report_notpipe () 
 { 
     : returns: TRUE when STDIN "ISN'T" a pipe;
@@ -573,6 +652,24 @@ report_usage ()
     :;
     : esac;
     echo USAGE $caller: $* 1>&2
+}
+rm_these () 
+{ 
+    : grep -v succesive arguments on a pipe;
+    : related: tiddlylink;
+    : date: 2022-09-04;
+    if_missingargs 1 $* && return 1;
+    case $# in 
+        1)
+            report_notpipe && return 1;
+            grep -v $1
+        ;;
+        *)
+            pipe_myargs $*
+        ;;
+    esac;
+    return;
+    comment $(myname) $1 PIPE $(myname) ${*:2}
 }
 runfrom () 
 { 
@@ -651,15 +748,15 @@ dp ()
     : do Dot Prof;
     : date: 2022-08-19;
     : date: 2022-08-22;
-    : date: 2022-09-03;
+    : date: 2022-09-04;
     [[ -f ./.prof ]] || { 
         cp $(dp_root)/lib/dot.prof .prof
     };
-    isfunction backup 2> /dev/null && backup .prof;
-    set ${1:-.prof};
+    isfunction backup 2> /dev/null && backup ./.prof;
+    set ${1:-./.prof};
     debug ENTRY $*;
     case $1 in 
-        .prof)
+        ./.prof)
             source $1
         ;;
         *)
@@ -677,8 +774,12 @@ dp_all ()
 { 
     : all the functions in the DP family;
     : date: 2022-08-22;
-    : date: 2022-09-03;
-    ${*:-echo} dp dp_{abstracts,all,diff,example,funs,init,install,profs,root,test,tolibrary,utilities,version}
+    : date: 2022-09-04;
+    ${*:-echo} dp	\
+               dp_{abstracts,all,diff,example,funs,init,install} \
+	       dp_{profs,root,test,tolibrary,utilities,version}  \
+	       dp_{cblock,compareall,functions,header,libraries} \
+	       dp_{restore,rmfunctions}
 }
 dp_example () 
 { 
@@ -695,7 +796,7 @@ dp_funs ()
     : list all function and their Dot Prof file;
     : date: 2022-07-30;
     : date: 2022-08-19;
-    : date: 2022-09-03;
+    : date: 2022-09-04;
     if_missingargs 1 $* && return;
     functions $1 | sed "s=$=	$1="
 }
@@ -715,7 +816,7 @@ dp_install ()
     : date: 2022-08-20;
     : ------------------ two main components of an APPs BITMELD --;
     : date: 2022-08-27;
-    : date: 2022-09-03;
+    : date: 2022-09-04;
     :;
     runfrom $(dp_root)/src || return;
     :;
@@ -780,14 +881,15 @@ dp_version ()
     : the SMART way, dp_version backup_ver;
     : date: 2022-08-22;
     : date: 2022-08-27;
-    : date: 2022-09-03;
-    ${*:-echo} 0.4.a
+    : date: 2022-09-04;
+    ${*:-echo} 0.4.0
 }
 dp_diff () 
 { 
-    : diff LIB and .prof versions of functions;
+    : diff LIB and ./.prof versions of functions;
     : lessons: ?? foreach was OK but Examine your TEST CASE, steady on DIFF ?;
     : date: 2022-08-22;
+    : date: 2022-09-04;
     debug ENTRY $# $*;
     if_missingargs 2 $* && return;
     local lib=$(which $1);
@@ -796,10 +898,10 @@ dp_diff ()
     for fun in $@;
     do
         debug FUN: $fun;
-        fun_peek $fun .prof > .dotp;
+        fun_peek $fun ./.prof > .dotp;
         fun_peek $fun $lib > .dlib;
-        diff .dlib .dotp 1>&2 || { 
-            printf "RETURN $?\n< $lib\n$fun\t.prof\n========\n\n\n"
+        diff .dlib .dotp || { 
+            printf "RETURN $?\n< $lib\n$fun\t./.prof\n========\n\n\n"
         };
     done
 }
@@ -815,5 +917,73 @@ dp_tolibrary ()
         lib=$(basename $dir);
         funslib $(grep $lib $out| field 1);
     done
+}
+dp_compareall () 
+{ 
+    : compare set vs family function lists;
+    : anticipates the general case;
+    : date: 2022-08-22;
+    : date: 2022-09-04;
+    if_missingargs 1 $* && return;
+    local all=${1}_all;
+    local fam="$1 $(sfg ${1}_)";
+    debug all: $all;
+    debug fam: $fam;
+    report_notfunction $all && return 1;
+    :;
+    $all | tpl | sort > .all;
+    echo $fam | tpl | sort > .fam;
+    comm .all .fam;
+    printf "%s\t%s\t%s\n" .all .fam BOTH
+}
+dp_header () 
+{ 
+    : collect the current Header Block from ./.prof;
+    : date: 2022-09-04;
+    awk -v p=1 '$2 ~ /^[(][)]$/ { exit }; p' ${1:-./.prof}
+}
+dp_cblock () 
+{ 
+    : collect the current Comment and Execution Blocks from ./.prof;
+    : date: 2022-09-04;
+    awk -v p=0 '$1 ~ /^false$/ { p = 1 }; p' ${1:-./.prof}
+}
+dp_functions () 
+{ 
+    : collect the functions from ./.Prof;
+    : date: 2022-09-04;
+    awk -v p=0 '
+        $1 ~ /^false$/  { p = 0 };
+	$2 ~ /^[(][)]$/ { p = 1 };
+	p
+    ' ${1:-./.prof} | functions
+}
+dp_restore () 
+{ 
+    : collect the ./.prof functions in these versions:;
+    : .prof.now -- the current function block;
+    : .prof.nxt -- current less functions removed by rmfunctions;
+    : .prof.tmp -- the reconstructed .prof;
+    : related: dp_rmfunctions ./.prof.tmp into a .prof.nxt;
+    : date: 2022-09-04;
+    :;
+    function _do_restore () 
+    { 
+        dp_header;
+        command declare -f $(dp_functions) > ./.prof.now;
+        [[ -f ./.prof.nxt ]] && cat ./.prof.nxt || cat ./.prof.now;
+        dp_cblock
+    };
+    _do_restore > ./.prof.tmp;
+    chmod +x ./.prof.tmp;
+    comment set -- .prof.{now,nxt,tmp}
+}
+dp_rmfunctions () 
+{ 
+    : remove the named function arguments from the collection;
+    : update ./.prof.tmp;
+    : date: 2022-09-04;
+    if_missingargs 1 $* && return;
+    command declare -f $(dp_functions | rm_these $*) | tee ./.prof.nxt
 }
 eval dp_init 1>&2
