@@ -4,6 +4,58 @@ source ./dplib     2> /dev/null
 export USER_BACKUP_AREA=/git/
 export ALTERNATE_BACKUP_DIRS=".bak ../version"
 alias dpd='off; source ./.prof'
+dp_version () 
+{ 
+    : print the version;
+    : the SMART way, dp_version backup_ver;
+    : date: 2022-08-22;
+    : date: 2022-08-27;
+    : date: 2022-09-06;
+    ${*:-echo} 0.4.0
+}
+dp_all () 
+{ 
+    : all the functions in the DP family;
+    : date: 2022-08-22;
+    : date: 2022-09-04;
+    ${*:-echo} dp	\
+    	       dp_{abstracts,all,diff,example,funs,hint,init,install}	\
+	       dp_{profs,root,test,tolibrary,utilities,version}	 	\
+	       dp_{cblock,compareall,functions,header,libraries}	\
+	       dp_{restore,rmfunctions}
+}
+backup_ver () 
+{ 
+    : creates a VERSION of the CURRENT BACKUP;
+    : VER_TIME is a DATE/TIME stamped directory in the VERSION directory;
+    : a LINK is sufficient if not mandatory.;
+    : see SEMANTIC Versioning online;
+    : date: 2017-03-05;
+    : date: 2019-04-28 remove opional argument name for version;
+    : date: 2020-05-02 add user-definable BACKUP_VERSION_FORMAT;
+    : ${BACKUP_VERSION_FORMAT:="%Y%m_%b/%d_%a/%H%M%S"};
+    : date: 2022-05-22;
+    : date: 2022-08-22;
+    backup_directories;
+    report_notdirectory $BACKUP_DIRECTORY && return 1;
+    local THIS_VERSION=${1:-$(date +"${BACKUP_VERSION_FORMAT}")};
+    debug VERSION_DIRECTORY $VERSION_DIRECTORY;
+    debug VERSION_DIRECTORY $vername;
+    set -- $(backup_files | sed "s/^/$BACKUP_DIRECTORY\//");
+    set -- ${*:-/dev/null};
+    debug BACKUP FILES: $*; pause;
+    : considering we may need to overwrite a NAMED version;
+    : and since time-stamped Versions are to the second,;
+    : its harmless in the default case;
+    :;
+    local ver="$VERSION_DIRECTORY/$THIS_VERSION";    
+    rm -rf "$ver"
+    ver=$(needir "$ver")
+    find "$ver" -type f; pause
+    :;
+    ln -f $* $ver
+    find "$ver" -type f
+}
 false &&
 {
 	return;
@@ -33,7 +85,7 @@ false &&
     
     sed -n '/false/,$p' ./.prof
 
-    def compare_all_lib
+    def dp_compareall
 
     dp install
 }        
@@ -51,8 +103,17 @@ false &&
     # def dp;
     # dp abstracts | j
     # dp help
-    # dp_install
-    echo . . . . . . .
-    dp_libraries ./.prof
-    echo . . . . . . .
-    dp_libraries ./dplib
+    # A ------- minimal work to upgrade to next version	--
+    # on;  backup_ver  $(dp_version); pause;
+    # pushd ..      
+    # find . -type f | egrep -v '\.(bak|git)/'; pause
+    # llrt $(find . -type f | egrep -v '\.(bak|git)/')
+    # cdx; pushd
+    # B ---------------- slight re-work to add function	--
+    # qf dp_compareall, edit to add
+    # dp_compareall dp
+    # I --------------------------------------- install	--
+    # dp_functions
+    # dp install
+    # repeat A
+    git status
