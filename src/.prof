@@ -4,23 +4,6 @@ source ./dplib     2> /dev/null
 export USER_BACKUP_AREA=/git/
 export ALTERNATE_BACKUP_DIRS=".bak ../version"
 alias dpd='off; source ./.prof'
-dp_version () 
-{ 
-    : print the version;
-    : the SMART way, dp_version backup_ver;
-    : date: 2022-08-22;
-    : date: 2022-08-27;
-    : date: 2022-09-04;
-    ${*:-echo} 0.4.0
-}
-dp_init () 
-{ 
-    : generic, have an "obsolete"  member to take out the trash
-    : date: 2022-08-20;
-    : date: 2022-08-22;
-    isfunction dp_obsolete && dp_obsolete unset;
-    dp_root
-}
 false &&
 {
 	return;
@@ -70,4 +53,6 @@ false &&
     # dp help
     # dp_install
     echo . . . . . . .
-    def dp_{restore,rmfunctions}
+    dp_libraries ./.prof
+    echo . . . . . . .
+    dp_libraries ./dplib

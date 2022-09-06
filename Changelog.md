@@ -15,6 +15,9 @@ versioning with a GitHub REPO.
 
 ### Added
 
+* *dp_wlhf* which library has the Function
+* *funclocn* ??, part of the TBD
+
 ### Changed
 
 * move dp/src/* to dp/*, simplifies **install**, also git feature and
@@ -68,8 +71,8 @@ Moved versions from ./ver/x.y.z to ../version/x.y.z
 * function **util_fmlib**, awaits development utilities release
 * sub-functions
 ** dp diff -- the difference between .prof and library function instance
+** dp tolib,  *dp_wlhf* which library has the Function
 ** dp tolibrary -- writes dot prof functions to primary library
-
 
 ### Changed
 

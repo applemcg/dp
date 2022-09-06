@@ -30,11 +30,7 @@ dp_all ()
     : all the functions in the DP family;
     : date: 2022-08-22;
     : date: 2022-09-04;
-    ${*:-echo} dp	\
-               dp_{abstracts,all,diff,example,funs,init,install} \
-	       dp_{profs,root,test,tolibrary,utilities,version}  \
-	       dp_{cblock,compareall,functions,header,libraries} \
-	       dp_{restore,rmfunctions}
+    ${*:-echo} dp dp_{abstracts,all,diff,example,funs,init,install} dp_{profs,root,test,tolibrary,utilities,version} dp_{cblock,compareall,functions,header,libraries} dp_{restore,rmfunctions}
 }
 dp_example () 
 { 
@@ -57,10 +53,11 @@ dp_funs ()
 }
 dp_init () 
 { 
-    : bring along its utillib;
+    : generic, have an "obsolete" member to take out the trash;
     : date: 2022-08-20;
     : date: 2022-08-22;
-    source $(which dputillib);
+    : date: 2022-09-04;
+    : date: 2022-09-06;
     isfunction dp_obsolete && dp_obsolete unset;
     dp_root
 }
@@ -71,7 +68,7 @@ dp_install ()
     : date: 2022-08-20;
     : ------------------ two main components of an APPs BITMELD --;
     : date: 2022-08-27;
-    : date: 2022-09-04;
+    : date: 2022-09-06;
     :;
     runfrom $(dp_root)/src || return;
     :;
@@ -136,8 +133,8 @@ dp_version ()
     : the SMART way, dp_version backup_ver;
     : date: 2022-08-22;
     : date: 2022-08-27;
-    : date: 2022-09-04;
-    ${*:-echo} 0.4.0
+    : date: 2022-09-06;
+    ${*:-echo} 0.4.a
 }
 dp_diff () 
 { 
@@ -164,14 +161,16 @@ dp_tolibrary ()
 { 
     : write dot prof functions to their primary directory;
     : date: 2022-08-25;
+    : date: 2022-09-06;
     local out=./funlib.out;
     for dir in $(
-      do_whf $(fdp) | tee $out | nf gt 1 | field 2 | sort -u
+      do_whf $(dp_functions) | tee $out | nf gt 1 | field 2 | sort -u
       );
     do
-        lib=$(basename $dir);
-        funslib $(grep $lib $out| field 1);
-    done
+        local lib=$(basename $dir);
+        echo funslib $(grep $lib $out| field 1);
+    done | tee .tolibrary.sh;
+    comment source .tolibrary.sh
 }
 dp_compareall () 
 { 
@@ -221,12 +220,13 @@ dp_restore ()
     : .prof.tmp -- the reconstructed .prof;
     : related: dp_rmfunctions ./.prof.tmp into a .prof.nxt;
     : date: 2022-09-04;
+    : date: 2022-09-06;
     :;
     function _do_restore () 
     { 
         dp_header;
         command declare -f $(dp_functions) > ./.prof.now;
-        [[ -f ./.prof.nxt ]] && cat ./.prof.nxt || cat ./.prof.now;
+        [[ -s ./.prof.nxt ]] && cat ./.prof.nxt || cat ./.prof.now;
         dp_cblock
     };
     _do_restore > ./.prof.tmp;
@@ -238,7 +238,23 @@ dp_rmfunctions ()
     : remove the named function arguments from the collection;
     : update ./.prof.tmp;
     : date: 2022-09-04;
+    : date: 2022-09-06;
     if_missingargs 1 $* && return;
-    command declare -f $(dp_functions | rm_these $*) | tee ./.prof.nxt
+    local nxt=./.prof.nxt;
+    set -- $(dp_functions | rm_these $*);
+    case $# in 
+        0)
+            cat /dev/null > $nxt
+        ;;
+        *)
+            declare -f $* | tee $nxt
+        ;;
+    esac
+}
+dp_libraries () 
+{ 
+    : collect function - home library pairs, default from .prof;
+    : date: 2022-09-06;
+    do_whf $(dp_functions ${1:-.prof})
 }
 eval dp_init 1>&2
