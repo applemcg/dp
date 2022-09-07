@@ -1,25 +1,9 @@
-source functionlib 2> /dev/null
+ksource functionlib 2> /dev/null
 source ./dp_app    2> /dev/null
 source ./dplib     2> /dev/null
 export USER_BACKUP_AREA=/git/
 export ALTERNATE_BACKUP_DIRS=".bak ../version"
 alias dpd='off; source ./.prof'
-dp_version () 
-{ 
-    : print the version;
-    : the SMART way, dp_version backup_ver;
-    : date: 2022-08-22;
-    : date: 2022-08-27;
-    : date: 2022-09-06;
-    ${*:-echo} 0.4.0
-}
-dp_all () 
-{ 
-    : all the functions in the DP family;
-    : date: 2022-08-22;
-    : date: 2022-09-04;
-    ${*:-echo} dp dp_{abstracts,all,diff,example,funs,hint,init,install} dp_{profs,root,test,tolibrary,utilities,version} dp_{cblock,compareall,functions,header,libraries} dp_{restore,rmfunctions}
-}
 
 false &&
 {
@@ -69,7 +53,7 @@ false &&
     # dp abstracts | j
     # dp help
     # dp_install
-    echo . . . . . . .
-    dp_libraries ./.prof
-    echo . . . . . . .
-    dp_libraries ./dplib
+    comment . . . . . . .
+    def dp; pause
+    # dp_libraries ./.prof | grep functionlib | field 1
+

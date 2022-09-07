@@ -2,22 +2,24 @@ dp ()
 { 
     : do Dot Prof;
     : date: 2022-08-19;
-    : date: 2022-08-22;
-    : date: 2022-09-04;
-    [[ -f ./.prof ]] || { 
-        cp $(dp_root)/lib/dot.prof .prof
-    };
-    isfunction backup 2> /dev/null && backup ./.prof;
-    set ${1:-./.prof};
-    debug ENTRY $*;
-    case $1 in 
-        ./.prof)
-            source $1
-        ;;
-        *)
-            fun_asapp $* && return
-        ;;
-    esac
+    : date: 2022-09-07;
+    set -- ./.prof;
+    [[ -f $1 ]] || { 
+        cat <<EOF > $1
+source functionlib
+false &&
+{
+    return;
+}
+on
+
+    do_whf $(dp_functions)
+    backup $1;   
+off
+EOF
+
+    }
+    source $1
 }
 dp_abstracts () 
 { 
@@ -136,7 +138,7 @@ dp_version ()
     : date: 2022-08-27;
     : date: 2022-09-06;
     : date: 2022-09-07;
-    ${*:-echo} 0.4.0
+    ${*:-echo} 0.4.A
 }
 dp_diff () 
 { 
