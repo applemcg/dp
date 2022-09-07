@@ -30,7 +30,8 @@ dp_all ()
     : all the functions in the DP family;
     : date: 2022-08-22;
     : date: 2022-09-04;
-    ${*:-echo} dp dp_{abstracts,all,diff,example,funs,init,install} dp_{profs,root,test,tolibrary,utilities,version} dp_{cblock,compareall,functions,header,libraries} dp_{restore,rmfunctions}
+    : date: 2022-09-07;
+    ${*:-echo} dp dp_{abstracts,all,diff,example,funs,hint,init,install} dp_{profs,root,test,tolibrary,utilities,version} dp_{cblock,compareall,functions,header,libraries} dp_{restore,rmfunctions}
 }
 dp_example () 
 { 
@@ -134,7 +135,8 @@ dp_version ()
     : date: 2022-08-22;
     : date: 2022-08-27;
     : date: 2022-09-06;
-    ${*:-echo} 0.4.a
+    : date: 2022-09-07;
+    ${*:-echo} 0.4.0
 }
 dp_diff () 
 { 
