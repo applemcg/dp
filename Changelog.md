@@ -29,7 +29,7 @@ versioning with a GitHub REPO.
 
 ### Security
 
-## [0.4.0] TBD
+## [0.4.0] 2022-09-08
 
 ### Added
 
