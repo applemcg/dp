@@ -161,11 +161,11 @@ dp_all ()
     : date: 2022-08-22;
     : date: 2022-09-04;
     : date: 2022-09-07;
-    ${*:-echo} dp
-	       dp_{root,version,all}    
-    	       dp_{abstracts,diff,example,funs,hint,init,install}
-	       dp_{profs,test,tolibrary,utilities}
-	       dp_{cblock,compareall,functions,header,libraries}
+    ${*:-echo} dp			\
+	       dp_{root,version,all}    \
+    	       dp_{abstracts,diff,example,funs,hint,init,install}	\
+	       dp_{profs,test,tolibrary,utilities}			\
+	       dp_{cblock,compareall,functions,header,libraries}	\
 	       dp_{clear,restore,rmfunctions}
 
 }
@@ -185,4 +185,4 @@ false &&
     # unset dp_{root,version}
     # dp_init
     # do_whf $(dp_utilities | functions) | tee .utils.out |  field 2 | sort | uniq -c
-    def dp
+    

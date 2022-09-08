@@ -3,22 +3,9 @@ dp ()
     : do Dot Prof;
     : date: 2022-08-19;
     : date: 2022-09-07;
+    : date: 2022-09-08;
     set -- ./.prof;
-    [[ -f $1 ]] || { 
-        cat <<EOF > $1
-source functionlib
-false &&
-{
-    return;
-}
-on
-
-    do_whf $(dp_functions)
-    backup $1;   
-off
-EOF
-
-    }
+    [[ -f $1 ]] || cp $(dp_lib)/dot.prof $1;
     source $1
 }
 dp_abstracts () 
@@ -33,7 +20,8 @@ dp_all ()
     : date: 2022-08-22;
     : date: 2022-09-04;
     : date: 2022-09-07;
-    ${*:-echo} dp dp_{abstracts,all,diff,example,funs,hint,init,install} dp_{profs,root,test,tolibrary,utilities,version} dp_{cblock,compareall,functions,header,libraries} dp_{restore,rmfunctions}
+    : date: 2022-09-08;
+    ${*:-echo} dp dp_{root,version,all} dp_{abstracts,diff,example,funs,hint,init,install} dp_{profs,test,tolibrary,utilities} dp_{cblock,compareall,functions,header,libraries} dp_{clear,restore,rmfunctions}
 }
 dp_example () 
 { 
@@ -61,8 +49,12 @@ dp_init ()
     : date: 2022-08-22;
     : date: 2022-09-04;
     : date: 2022-09-06;
+    : date: 2022-09-08;
     isfunction dp_obsolete && dp_obsolete unset;
-    dp_root
+    : manufacture DP_ ROOT, VERSION functions, include names in ALL.;
+    : installations might unset,;
+    setget dp_root $HOME/dropbox/marty3/git/dp;
+    setget dp_version 0.4.a
 }
 dp_install () 
 { 
@@ -71,24 +63,17 @@ dp_install ()
     : date: 2022-08-20;
     : ------------------ two main components of an APPs BITMELD --;
     : date: 2022-08-27;
-    : date: 2022-09-06;
+    : date: 2022-09-08;
     :;
-    runfrom $(dp_root)/src || return;
+    runfrom $(dp_root) || return;
     :;
     local bin=$(needir $(dp_root)/bin);
     local lib=$(needir $(dp_root)/lib);
     :;
-    : ---------------- install Readable Information in the ROOT --;
-    :;
-    ln -f ./README.md $(dp_root);
-    ln -f ./Changelog.md $(dp_root);
-    ln -f ./ManualPage.md $(dp_root);
-    ln -f ./Workflow.md $(dp_root);
-    ln -f ./Versioning.md $(dp_root);
-    :;
     : ---------------------------------- manufacture the dp_app --;
     :;
-    dp_utilities | cat - ./dplib | onlyChanged dp_app;
+    badkup ./dplib ./dp_app;
+    dp_utilities | cat - ./dplib | onlyChanged ./dp_app;
     :;
     : ------------------------- install just the APP in the BIN --;
     :;
@@ -225,12 +210,18 @@ dp_restore ()
     : related: dp_rmfunctions ./.prof.tmp into a .prof.nxt;
     : date: 2022-09-04;
     : date: 2022-09-06;
+    : date: 2022-09-08;
     :;
     function _do_restore () 
     { 
         dp_header;
-        command declare -f $(dp_functions) > ./.prof.now;
-        [[ -s ./.prof.nxt ]] && cat ./.prof.nxt || cat ./.prof.now;
+        declare -f $(dp_functions) > ./.prof.now;
+        :;
+        : ---------------- cat non-empty .prof.nxt or .prof.now --;
+        :;
+        local suf=$( if_elseif ' -s ./.prof.nxt' nxt now);
+        cat .prof.$suf;
+        :;
         dp_cblock
     };
     _do_restore > ./.prof.tmp;
@@ -260,5 +251,13 @@ dp_libraries ()
     : collect function - home library pairs, default from .prof;
     : date: 2022-09-06;
     do_whf $(dp_functions ${1:-.prof})
+}
+dp_clear () 
+{ 
+    : set up to clear functions from .prof, with a non-empty .prof.nxt;
+    : date: 2022-09-08;
+    printf "\n" > .prof.nxt;
+    ls -alrt .prof*;
+    comment dp_restore
 }
 eval dp_init 1>&2
