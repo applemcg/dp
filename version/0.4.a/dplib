@@ -2,12 +2,23 @@ dp ()
 { 
     : do Dot Prof;
     : date: 2022-08-19;
-    : date: 2022-08-20;
+    : date: 2022-09-07;
     set -- ./.prof;
     [[ -f $1 ]] || { 
-        cp $(dp_dev)/dot.prof $1
-    };
-    backup $1;
+        cat <<EOF > $1
+source functionlib
+false &&
+{
+    return;
+}
+on
+
+    do_whf $(dp_functions)
+    backup $1;   
+off
+EOF
+
+    }
     source $1
 }
 dp_abstracts () 
@@ -18,14 +29,11 @@ dp_abstracts ()
 }
 dp_all () 
 { 
-    : default list of DP functions;
-    debug ENTRY $*;
-    ${*:-echo} dp $(sfg dp_)
-}
-dp_dev () 
-{ 
-    : the development, think ~/src/... directory for source control;
-    ${*:-echo} $(needir $HOME/Dropbox/marty3/git/dp)
+    : all the functions in the DP family;
+    : date: 2022-08-22;
+    : date: 2022-09-04;
+    : date: 2022-09-07;
+    ${*:-echo} dp dp_{abstracts,all,diff,example,funs,hint,init,install} dp_{profs,root,test,tolibrary,utilities,version} dp_{cblock,compareall,functions,header,libraries} dp_{restore,rmfunctions}
 }
 dp_example () 
 { 
@@ -42,21 +50,57 @@ dp_funs ()
     : list all function and their Dot Prof file;
     : date: 2022-07-30;
     : date: 2022-08-19;
+    : date: 2022-09-04;
+    if_missingargs 1 $* && return;
     functions $1 | sed "s=$=	$1="
 }
-dp_lib () 
+dp_init () 
 { 
-    : the name of the DP library;
-    : date: 2022-08-19;
+    : generic, have an "obsolete" member to take out the trash;
     : date: 2022-08-20;
-    ${*:-echo} $(needir $(dp_dev))/dplib
+    : date: 2022-08-22;
+    : date: 2022-09-04;
+    : date: 2022-09-06;
+    isfunction dp_obsolete && dp_obsolete unset;
+    dp_root
 }
-dp_list () 
+dp_install () 
 { 
-    : functions in the DP family;
-    : date: 2022-08-19;
+    : move the run-time components into place;
+    : versions are tracked in SRC, not in BIN, LIB;
     : date: 2022-08-20;
-    ${*:-echo} dp $( sfg dp_ )
+    : ------------------ two main components of an APPs BITMELD --;
+    : date: 2022-08-27;
+    : date: 2022-09-06;
+    :;
+    runfrom $(dp_root)/src || return;
+    :;
+    local bin=$(needir $(dp_root)/bin);
+    local lib=$(needir $(dp_root)/lib);
+    :;
+    : ---------------- install Readable Information in the ROOT --;
+    :;
+    ln -f ./README.md $(dp_root);
+    ln -f ./Changelog.md $(dp_root);
+    ln -f ./ManualPage.md $(dp_root);
+    ln -f ./Workflow.md $(dp_root);
+    ln -f ./Versioning.md $(dp_root);
+    :;
+    : ---------------------------------- manufacture the dp_app --;
+    :;
+    dp_utilities | cat - ./dplib | onlyChanged dp_app;
+    :;
+    : ------------------------- install just the APP in the BIN --;
+    :;
+    chmod 775 ./dp_app;
+    ln -f ./dp_app $bin;
+    :;
+    : ------------------------------- install text files in LIB --;
+    ln -f ./dot.prof $lib;
+    :;
+    : ------------------------------------------- all installed --;
+    :;
+    indir $(dp_root) find . -type file | egrep -v '\.(bak|git)/'
 }
 dp_profs () 
 { 
@@ -65,20 +109,20 @@ dp_profs ()
     : date: 2022-08-19;
     find $(home) -type f -name .prof | egrep -v '.(ver|bak)/'
 }
-dp_qf () 
+dp_root () 
 { 
-    : named show Quick Function ...;
-    : date: 2019-08-11;
-    : date: 2021-08-28;
-    : date: 2022-08-19;
-    declare -f ${*:-qf} | tee .qf
+    : the development, think ~/src/... directory for source control;
+    : date: 2022-08-22;
+    : ${DP_ROOT:=$(needir $HOME/Dropbox/marty3/git/dp)};
+    ${*:-echo} $DP_ROOT
 }
 dp_test () 
 { 
     : home for DP testing, "it's shaping up in the FALSE block";
     : date: 2022-08-19;
     : date: 2022-08-20;
-    ${*:-echo} $(needir $(dp_dev)/dp_test)
+    : date: 2022-08-22;
+    ${*:-echo} $(needir $(dp_root)/dp_test)
 }
 dp_utilities () 
 { 
@@ -86,30 +130,135 @@ dp_utilities ()
     : date: 2022-08-20;
     declare -f $(comm -23 <(app_fun $(functions dplib) 2> /dev/null) <( dp_all| tpl))
 }
-dp_install () 
+dp_version () 
 { 
-    : move the run-time components into place;
-    : date: 2022-08-20;
-    local bin=$(needir $(dp_dev)/bin);
-    local lib=$(needir $(dp_dev)/lib);
+    : print the version;
+    : the SMART way, dp_version backup_ver;
+    : date: 2022-08-22;
+    : date: 2022-08-27;
+    : date: 2022-09-06;
+    : date: 2022-09-07;
+    ${*:-echo} 0.4.A
+}
+dp_diff () 
+{ 
+    : diff LIB and ./.prof versions of functions;
+    : lessons: ?? foreach was OK but Examine your TEST CASE, steady on DIFF ?;
+    : date: 2022-08-22;
+    : date: 2022-09-04;
+    debug ENTRY $# $*;
+    if_missingargs 2 $* && return;
+    local lib=$(which $1);
+    shift;
+    debug LIB: $lib;
+    for fun in $@;
+    do
+        debug FUN: $fun;
+        fun_peek $fun ./.prof > .dotp;
+        fun_peek $fun $lib > .dlib;
+        diff .dlib .dotp || { 
+            printf "RETURN $?\n< $lib\n$fun\t./.prof\n========\n\n\n"
+        };
+    done
+}
+dp_tolibrary () 
+{ 
+    : write dot prof functions to their primary directory;
+    : date: 2022-08-25;
+    : date: 2022-09-06;
+    local out=./funlib.out;
+    for dir in $(
+      do_whf $(dp_functions) | tee $out | nf gt 1 | field 2 | sort -u
+      );
+    do
+        local lib=$(basename $dir);
+        echo funslib $(grep $lib $out| field 1);
+    done | tee .tolibrary.sh;
+    comment source .tolibrary.sh
+}
+dp_compareall () 
+{ 
+    : compare set vs family function lists;
+    : anticipates the general case;
+    : date: 2022-08-22;
+    : date: 2022-09-04;
+    if_missingargs 1 $* && return;
+    local all=${1}_all;
+    local fam="$1 $(sfg ${1}_)";
+    debug all: $all;
+    debug fam: $fam;
+    report_notfunction $all && return 1;
     :;
-    ln -f $(dp_lib) $bin;
-    ln -f $(dp_utillib) $bin;
-    chmod 775 $bin/*;
-    ln -f $(dp_dev)/dot.prof $lib
+    $all | tpl | sort > .all;
+    echo $fam | tpl | sort > .fam;
+    comm .all .fam;
+    printf "%s\t%s\t%s\n" .all .fam BOTH
 }
-dp_utillib () 
+dp_header () 
 { 
-    : the name of the DP library;
-    : and we have a slight mismatch because of naming conventions;
-    : date: 2022-08-19;
-    : date: 2022-08-20;
-    ${*:-echo} $(needir $(dp_dev))/dputillib
+    : collect the current Header Block from ./.prof;
+    : date: 2022-09-04;
+    awk -v p=1 '$2 ~ /^[(][)]$/ { exit }; p' ${1:-./.prof}
 }
-dp_init () 
+dp_cblock () 
 { 
-    : "bring along it's utillib";
-    : date: 2022-08-20;
-    source $(which dputillib)
+    : collect the current Comment and Execution Blocks from ./.prof;
+    : date: 2022-09-04;
+    awk -v p=0 '$1 ~ /^false$/ { p = 1 }; p' ${1:-./.prof}
+}
+dp_functions () 
+{ 
+    : collect the functions from ./.Prof;
+    : date: 2022-09-04;
+    awk -v p=0 '
+        $1 ~ /^false$/  { p = 0 };
+	$2 ~ /^[(][)]$/ { p = 1 };
+	p
+    ' ${1:-./.prof} | functions
+}
+dp_restore () 
+{ 
+    : collect the ./.prof functions in these versions:;
+    : .prof.now -- the current function block;
+    : .prof.nxt -- current less functions removed by rmfunctions;
+    : .prof.tmp -- the reconstructed .prof;
+    : related: dp_rmfunctions ./.prof.tmp into a .prof.nxt;
+    : date: 2022-09-04;
+    : date: 2022-09-06;
+    :;
+    function _do_restore () 
+    { 
+        dp_header;
+        command declare -f $(dp_functions) > ./.prof.now;
+        [[ -s ./.prof.nxt ]] && cat ./.prof.nxt || cat ./.prof.now;
+        dp_cblock
+    };
+    _do_restore > ./.prof.tmp;
+    chmod +x ./.prof.tmp;
+    comment set -- .prof.{now,nxt,tmp}
+}
+dp_rmfunctions () 
+{ 
+    : remove the named function arguments from the collection;
+    : update ./.prof.tmp;
+    : date: 2022-09-04;
+    : date: 2022-09-06;
+    if_missingargs 1 $* && return;
+    local nxt=./.prof.nxt;
+    set -- $(dp_functions | rm_these $*);
+    case $# in 
+        0)
+            cat /dev/null > $nxt
+        ;;
+        *)
+            declare -f $* | tee $nxt
+        ;;
+    esac
+}
+dp_libraries () 
+{ 
+    : collect function - home library pairs, default from .prof;
+    : date: 2022-09-06;
+    do_whf $(dp_functions ${1:-.prof})
 }
 eval dp_init 1>&2
