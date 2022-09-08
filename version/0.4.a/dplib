@@ -1,0 +1,115 @@
+dp () 
+{ 
+    : do Dot Prof;
+    : date: 2022-08-19;
+    : date: 2022-08-20;
+    set -- ./.prof;
+    [[ -f $1 ]] || { 
+        cp $(dp_dev)/dot.prof $1
+    };
+    backup $1;
+    source $1
+}
+dp_abstracts () 
+{ 
+    : write the Table for DP function ABSTRACTS;
+    rdb_hdr name abstract;
+    foreach abstract $(dp_all)
+}
+dp_all () 
+{ 
+    : default list of DP functions;
+    debug ENTRY $*;
+    ${*:-echo} dp $(sfg dp_)
+}
+dp_dev () 
+{ 
+    : the development, think ~/src/... directory for source control;
+    ${*:-echo} $(needir $HOME/Dropbox/marty3/git/dp)
+}
+dp_example () 
+{ 
+    : dotprof usage examples;
+    : date: 2022-08-19;
+    foreach dp_funs $(dp_profs) 1>&2;
+    echo . . . .;
+    foreach dp_funs $(dp_profs) | field 2 | sort -u;
+    echo . . . .;
+    declare -f $(myname)
+}
+dp_funs () 
+{ 
+    : list all function and their Dot Prof file;
+    : date: 2022-07-30;
+    : date: 2022-08-19;
+    functions $1 | sed "s=$=	$1="
+}
+dp_lib () 
+{ 
+    : the name of the DP library;
+    : date: 2022-08-19;
+    : date: 2022-08-20;
+    ${*:-echo} $(needir $(dp_dev))/dplib
+}
+dp_list () 
+{ 
+    : functions in the DP family;
+    : date: 2022-08-19;
+    : date: 2022-08-20;
+    ${*:-echo} dp $( sfg dp_ )
+}
+dp_profs () 
+{ 
+    : list the active Dot-Profs;
+    : date: 2022-07-30;
+    : date: 2022-08-19;
+    find $(home) -type f -name .prof | egrep -v '.(ver|bak)/'
+}
+dp_qf () 
+{ 
+    : named show Quick Function ...;
+    : date: 2019-08-11;
+    : date: 2021-08-28;
+    : date: 2022-08-19;
+    declare -f ${*:-qf} | tee .qf
+}
+dp_test () 
+{ 
+    : home for DP testing, "it's shaping up in the FALSE block";
+    : date: 2022-08-19;
+    : date: 2022-08-20;
+    ${*:-echo} $(needir $(dp_dev)/dp_test)
+}
+dp_utilities () 
+{ 
+    : functions used by dplib functions;
+    : date: 2022-08-20;
+    declare -f $(comm -23 <(app_fun $(functions dplib) 2> /dev/null) <( dp_all| tpl))
+}
+dp_install () 
+{ 
+    : move the run-time components into place;
+    : date: 2022-08-20;
+    local bin=$(needir $(dp_dev)/bin);
+    local lib=$(needir $(dp_dev)/lib);
+    :;
+    ln -f $(dp_lib) $bin;
+    ln -f $(dp_utillib) $bin;
+    chmod 775 $bin/*;
+    ln -f $(dp_dev)/dot.prof $lib
+}
+dp_utillib () 
+{ 
+    : the name of the DP library;
+    : and we have a slight mismatch because of naming conventions;
+    : date: 2022-08-19;
+    : date: 2022-08-20;
+    ${*:-echo} $(needir $(dp_dev))/dputillib
+}
+dp_init () 
+{ 
+    : "bring along it's utillib";
+    : date: 2022-08-20;
+    source $(which dputillib)
+}
+eval dp_init 1>&2

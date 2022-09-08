@@ -15,24 +15,8 @@ versioning with a GitHub REPO.
 
 ### Added
 
-### Changed
-
-### Deprecated
-
-### Fixed
-
-### Security
-
-
-## [0.4.a] TBD
-
-### Added
-
 * *dp_wlhf* which library has the Function
 * *funclocn* ??, part of the TBD
-* *dp_clear*  anticipates dp_restore
-* *dp_root*, *dp_version* are now assigned in *dp_init* by **setget**,
-    and may be set by user from the commmand line.
 
 ### Changed
 
@@ -43,11 +27,9 @@ versioning with a GitHub REPO.
 
 ### Fixed
 
-* **dp** itself.   Remove a gratuitous **backup**
-
 ### Security
 
-## [0.4.0] 2022-09-08
+## [0.4.0] TBD
 
 ### Added
 
@@ -104,7 +86,7 @@ Moved versions from ./ver/x.y.z to ../version/x.y.z
 * dputillib audited for completeness, built during dp_install
 * added README.md to SRC, install in parent
 
-## [0.2.0] 2022-08-21
+## [0.2.0]  2022-08-21
 
 ### Added
 
