@@ -15,8 +15,24 @@ versioning with a GitHub REPO.
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Fixed
+
+### Security
+
+
+## [0.4.a] TBD
+
+### Added
+
 * *dp_wlhf* which library has the Function
 * *funclocn* ??, part of the TBD
+* *dp_clear*  anticipates dp_restore
+* *dp_root*, *dp_version* are not assigned in *dp_init* by **setget**, and 
+    may be set by user from the commmand line.
 
 ### Changed
 
@@ -26,6 +42,8 @@ versioning with a GitHub REPO.
 ### Deprecated
 
 ### Fixed
+
+* **dp** itself.   Remove a gratuitous **backup**
 
 ### Security
 
