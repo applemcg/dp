@@ -49,6 +49,18 @@ false &&
     # 5. clean out .prof
     # dp_functions
     # declare -f dp_{qfile,wlhf}
+    # -------------------------------------- VERSIONING locally	--
+    # git
+    # git add newfeatures
+    # gagm
+    # backup $(backup_files)
+    # backup_ver $(dp_version)
+    # llrt $(find version -type f )
+    # git add version/0.4.a/*
+    gagm
+    git commit -m $(dp_version)    
+    git push
+    git
 }
     #
     # --------------------------- debuging, MAINTENANCE testing locally	--    
@@ -72,17 +84,3 @@ false &&
     # source ./dp_app
     # shd_latest $(functions ./dp_app) | sort
     # ------        
-    # -------------------------------------- VERSIONING locally	--
-    # git
-    # git add newfeatures
-    # gagm
-    # backup $(backup_files)
-    # backup_ver $(dp_version)
-    # llrt $(find version -type f )
-    # git add version/0.4.a/*
-    # gagm
-    git commit -m $(dp_version)    
-    echo ------
-    git push
-    # echo ------
-    git
