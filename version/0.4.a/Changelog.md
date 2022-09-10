@@ -38,12 +38,13 @@ versioning with a GitHub REPO.
 
 * move dp/src/* to dp/*, simplifies **install**, also git feature and
   compatible with **dfg** usage
+* Workflow is now in OrgMode
 
 ### Deprecated
 
 ### Fixed
 
-* **dp** itself.   Remove a gratuitous **backup**
+* **dp** itself.   Remove a gratuitous **backup**, default copy in lib/dot.prof
 
 ### Security
 

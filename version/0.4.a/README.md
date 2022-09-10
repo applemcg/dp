@@ -2,19 +2,20 @@
 Dot Prof
 ========
 	
-Dot Prof is a tool, shell function library, builit into a shell
-application. It is used for initial development, and appropriately in
-maintenance.  Since it was born to develop shell function libraries,
-its use in other language environments is an un-performed experiment,
-as yet.
+Dot Prof is a tool, a shell function library, built into a shell
+application. I use it for initial development and function
+maintenance.  It has grown out of my developing shell function
+libraries.
 
-Since some facets of the programming environment are local, the
-opening concept is extending the user's profile beyond the login
-profile into local **.prof** files
+Since aspects of function development are local to a specific directory, it
+seemse useful to extend the concept of the  user's profile beyond the login
+directory into local **.prof** files.
 
-These documents describe the programmer's workflow at two levels, also
-provide a manual page format, and include a Changelog. This latter
-document brings with it a set or versioning requirements. 
+The documents here describe the programmer's workflow at two levels,
+that of the developemen and maintenance task, as well as employing
+change-control.  Other documents provide a manual page format, and
+include a Changelo, which document brings with it a set of versioning
+requirements.
 
 It is worth saying the required rigor of the later steps in the
 development cycle is well-supported by the the method here. Unit tests

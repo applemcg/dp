@@ -1,25 +1,14 @@
 dp () 
 { 
-    : do Dot Prof;
+    : do Dot Prof, backing up once/day, and sourceing .prof;
     : date: 2022-08-19;
-    : date: 2022-09-07;
-    set -- ./.prof;
-    [[ -f $1 ]] || { 
-        cat <<EOF > $1
-source functionlib
-false &&
-{
-    return;
-}
-on
-
-    do_whf $(dp_functions)
-    backup $1;   
-off
-EOF
-
-    }
-    source $1
+    : date: 2022-09-10;
+    local file=./.prof;
+    local back=.bak/$file;
+    [[ -f $file ]] || cp $(dp_root)/lib/dot.prof $file;
+    [[ -f $back ]] || backup $file;
+    modified_today $back || backup $file;
+    source $file
 }
 dp_abstracts () 
 { 
@@ -31,9 +20,8 @@ dp_all ()
 { 
     : all the functions in the DP family;
     : date: 2022-08-22;
-    : date: 2022-09-04;
-    : date: 2022-09-07;
-    ${*:-echo} dp dp_{abstracts,all,diff,example,funs,hint,init,install} dp_{profs,root,test,tolibrary,utilities,version} dp_{cblock,compareall,functions,header,libraries} dp_{restore,rmfunctions}
+    : date: 2022-09-10;
+    ${*:-echo} dp dp_{root,version,all} dp_{abstracts,diff,example,funs,init,install} dp_{profs,test,tolibrary,utilities} dp_{cblock,compareall,functions,header,libraries} dp_{clear,restore,rmfunctions,qfile,wlhf{,_test}}
 }
 dp_example () 
 { 
@@ -58,11 +46,14 @@ dp_init ()
 { 
     : generic, have an "obsolete" member to take out the trash;
     : date: 2022-08-20;
-    : date: 2022-08-22;
-    : date: 2022-09-04;
-    : date: 2022-09-06;
+    : date: 2022-09-10;
     isfunction dp_obsolete && dp_obsolete unset;
-    dp_root
+    : manufacture DP_ ROOT, VERSION functions, include names in ALL.;
+    : todo: test both aspects, VARIABLE, and function;
+    :;
+    unset dp_{root,version};
+    setget dp_root $HOME/dropbox/marty3/git/dp;
+    setget dp_version 0.4.a
 }
 dp_install () 
 { 
@@ -71,36 +62,29 @@ dp_install ()
     : date: 2022-08-20;
     : ------------------ two main components of an APPs BITMELD --;
     : date: 2022-08-27;
-    : date: 2022-09-06;
+    : date: 2022-09-10;
     :;
-    runfrom $(dp_root)/src || return;
+    runfrom $(dp_root) || return;
     :;
     local bin=$(needir $(dp_root)/bin);
     local lib=$(needir $(dp_root)/lib);
     :;
-    : ---------------- install Readable Information in the ROOT --;
-    :;
-    ln -f ./README.md $(dp_root);
-    ln -f ./Changelog.md $(dp_root);
-    ln -f ./ManualPage.md $(dp_root);
-    ln -f ./Workflow.md $(dp_root);
-    ln -f ./Versioning.md $(dp_root);
-    :;
     : ---------------------------------- manufacture the dp_app --;
     :;
-    dp_utilities | cat - ./dplib | onlyChanged dp_app;
+    doit backup ./dplib ./dp_app;
+    doit dp_utilities | cat - ./dplib | onlyChanged ./dp_app;
     :;
     : ------------------------- install just the APP in the BIN --;
     :;
     chmod 775 ./dp_app;
-    ln -f ./dp_app $bin;
+    doit ln -f ./dp_app $bin;
     :;
     : ------------------------------- install text files in LIB --;
     ln -f ./dot.prof $lib;
     :;
     : ------------------------------------------- all installed --;
     :;
-    indir $(dp_root) find . -type file | egrep -v '\.(bak|git)/'
+    comment indir $(dp_root) find . -type file | egrep -v '\.(bak|git)/'
 }
 dp_profs () 
 { 
@@ -111,10 +95,12 @@ dp_profs ()
 }
 dp_root () 
 { 
-    : the development, think ~/src/... directory for source control;
-    : date: 2022-08-22;
-    : ${DP_ROOT:=$(needir $HOME/Dropbox/marty3/git/dp)};
-    ${*:-echo} $DP_ROOT
+    : mfg: dp_init;
+    : date: 2022-09-08;
+    [[ $# -ge 1 ]] && { 
+        setenv DP_ROOT "$1"
+    };
+    echo ${DP_ROOT:?}
 }
 dp_test () 
 { 
@@ -132,13 +118,12 @@ dp_utilities ()
 }
 dp_version () 
 { 
-    : print the version;
-    : the SMART way, dp_version backup_ver;
-    : date: 2022-08-22;
-    : date: 2022-08-27;
-    : date: 2022-09-06;
-    : date: 2022-09-07;
-    ${*:-echo} 0.4.A
+    : mfg: dp_init;
+    : date: 2022-09-08;
+    [[ $# -ge 1 ]] && { 
+        setenv DP_VERSION "$1"
+    };
+    echo ${DP_VERSION:?}
 }
 dp_diff () 
 { 
@@ -224,13 +209,18 @@ dp_restore ()
     : .prof.tmp -- the reconstructed .prof;
     : related: dp_rmfunctions ./.prof.tmp into a .prof.nxt;
     : date: 2022-09-04;
-    : date: 2022-09-06;
+    : date: 2022-09-10;
     :;
     function _do_restore () 
     { 
         dp_header;
-        command declare -f $(dp_functions) > ./.prof.now;
-        [[ -s ./.prof.nxt ]] && cat ./.prof.nxt || cat ./.prof.now;
+        declare -f $(dp_functions) > ./.prof.now;
+        :;
+        : ---------------- cat non-empty .prof.nxt or .prof.now --;
+        :;
+        local suf=$( if_elseif ' -s ./.prof.nxt' nxt now);
+        cat .prof.$suf;
+        :;
         dp_cblock
     };
     _do_restore > ./.prof.tmp;
@@ -260,5 +250,62 @@ dp_libraries ()
     : collect function - home library pairs, default from .prof;
     : date: 2022-09-06;
     do_whf $(dp_functions ${1:-.prof})
+}
+dp_clear () 
+{ 
+    : set up to clear functions from .prof, with a non-empty .prof.nxt;
+    : date: 2022-09-08;
+    printf "\n" > .prof.nxt;
+    ls -alrt .prof*;
+    comment dp_restore
+}
+dp_wlhf () 
+{ 
+    : Which Library Has the Function;
+    : related: functions do_whf;
+    : date: 2016-11-11;
+    : date: 2020-09-30;
+    : date: 2021-02-07 all internal, non _ function names;
+    : date: 2022-01-02;
+    : date: 2022-09-10;
+    if_missingargs 1 $* && return;
+    : FUNCTION tab file or empty;
+    local fmt="%s\t%s\n";
+    debug ENTRY $# $*;
+    for fun in $*;
+    do
+        for file in $(funclocn);
+        do
+            local qfile=$(dp_qfile $fun $file);
+            [[ -n $qfile ]] && { 
+                printf $fmt $fun $qfile;
+                break
+            };
+        done;
+        printf $fmt $fun "";
+    done | awk '!p[$1]++'
+}
+dp_qfile () 
+{ 
+    : return the name of the FILE if the FUN is defined;
+    : date: 2022-09-10;
+    :;
+    if_missingargs 2 $* && return;
+    report_notfunction $1 && return 1;
+    report_notfile $2 && return 2;
+    :;
+    awk -v patn="^$1$" '
+
+        $1 ~ patn && $2 ~ /^[(][)]$/ { printf FILENAME; exit }
+
+    ' "$2"
+}
+dp_wlhf_test () 
+{ 
+    : good opportunity to use /RDB;
+    : date: 2022-09-10;
+    ( rdb_hdr name file;
+    dp_wlhf backup $(sfg iso_);
+    : ----------------------- ) | tee $(needir tmp)/wlhf.rdb | rowhas file ${1:-functionlib}
 }
 eval dp_init 1>&2

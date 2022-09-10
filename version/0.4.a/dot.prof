@@ -1,10 +1,11 @@
-source_existing functionlib
-source_existing dplib
+source dplib
+comment ()
+{
+    : the semantic comment
+    echo "$@" 1>&2
+} 
 false &&
 {
     return;
 }
-on
     functions .prof
-off
-    backup .prof
