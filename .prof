@@ -1,174 +1,10 @@
-ksource functionlib 2> /dev/null
+source functionlib 2> /dev/null
 source ./dp_app    2> /dev/null
 source ./dplib     2> /dev/null
 export USER_BACKUP_AREA=/git/
 export ALTERNATE_BACKUP_DIRS=".bak ./version"
 alias dpd='off; source ./.prof'
-dp_install () 
-{ 
-    : move the run-time components into place;
-    : versions are tracked in SRC, not in BIN, LIB;
-    : date: 2022-08-20;
-    : ------------------ two main components of an APPs BITMELD --;
-    : date: 2022-08-27;
-    :;
-    runfrom $(dp_root)   || return;
-    :;
-    local bin=$(needir $(dp_root)/bin);
-    local lib=$(needir $(dp_root)/lib);
-    :;
-    : ---------------------------------- manufacture the dp_app --;
-    :;
-    badkup ./dplib ./dp_app
-    dp_utilities | cat - ./dplib | onlyChanged ./dp_app;
-    :;
-    : ------------------------- install just the APP in the BIN --;
-    :;
-    chmod 775 ./dp_app;
-    ln -f ./dp_app $bin;
-    :;
-    : ------------------------------- install text files in LIB --;
-    ln -f ./dot.prof $lib;
-    :;
-    : ------------------------------------------- all installed --;
-    :;
-    indir $(dp_root) find . -type file | egrep -v '\.(bak|git)/'
-}
-dp_clear () 
-{ 
-    : set up to clear functions from .prof, with a non-empty .prof.nxt;
-    printf "\n" > .prof.nxt;
-    ls -alrt .prof*;
-    comment dp_restore
-}
-dp_restore () 
-{ 
-    : collect the ./.prof functions in these versions:;
-    : .prof.now -- the current function block;
-    : .prof.nxt -- current less functions removed by rmfunctions;
-    : .prof.tmp -- the reconstructed .prof;
-    : related: dp_rmfunctions ./.prof.tmp into a .prof.nxt;
-    : date: 2022-09-04;
-    : date: 2022-09-06;
-    :;
-    function _do_restore () 
-    { 
-        dp_header;
-        declare -f $(dp_functions) > ./.prof.now;
-        :;
-        : ---------------- cat non-empty .prof.nxt or .prof.now --;
-        :;
-        local suf=$( if_elseif ' -s ./.prof.nxt' nxt now);
-        cat .prof.$suf;
-        :;
-        dp_cblock
-    };
-    _do_restore > ./.prof.tmp;
-    chmod +x ./.prof.tmp;
-    comment set -- .prof.{now,nxt,tmp}
-}
-setget () 
-{ 
-    : SET or GET a value from a function CALL;
-    : date: 2020-05-09;
-    :;
-    : ~ name value -- defines NAME function returning VALUE;
-    : ~ name -- defines NAME function with no value, but now settable;
-    : date: 2018-10-19;
-    debug ENTRY $# $*        
-    report_isfunction $1 , unset $1 to reuse it && return 1;
-    set $1 $(echo $1| tr a-z A-Z) "$2";
-    debug A $*    
-    local boiler=": mfg: $(myname 2);: date: 2022-09-08";
-    debug boiler: $boiler    
-    local param="$2:?"
-    debug param: $param;
-    local messg="echo \${$param}"
-    debug messg: $messg
-    local desid="[[ \$# -ge 1 ]] && { setenv $2 \"\$1\"; }"
-    debug desid: $desid
-    local whfun="$1 () { $boiler; $desid; $messg; }"
-    debug whfun: "$whfun"    
-    eval "$whfun"
-}
-backup_ver () 
-{ 
-    : creates a VERSION of the CURRENT BACKUP;
-    : VER_TIME is a DATE/TIME stamped directory in the VERSION directory;
-    : a LINK is sufficient if not mandatory.;
-    : see SEMANTIC Versioning online;
-    : date: 2017-03-05;
-    : date: 2019-04-28 remove opional argument name for version;
-    : date: 2020-05-02 add user-definable BACKUP_VERSION_FORMAT;
-    : ${BACKUP_VERSION_FORMAT:="%Y%m_%b/%d_%a/%H%M%S"};
-    : date: 2022-05-22;
-    : date: 2022-08-22;
-    : date: 2022-09-06;
-    backup_directories;
-    report_notdirectory $BACKUP_DIRECTORY && return 1;
-    local THIS_VERSION=${1:-$(date +"${BACKUP_VERSION_FORMAT}")};
-    debug VERSION_DIRECTORY $VERSION_DIRECTORY;
-    set -- $(backup_files | sed "s/^/$BACKUP_DIRECTORY\//");
-    set -- ${*:-/dev/null};
-    debug BACKUP FILES: $*;
-    pause;
-    : considering we may need to overwrite a NAMED version;
-    : and since time-stamped Versions are to the second,;
-    : its harmless in the default case;
-    :;
-    local ver="$VERSION_DIRECTORY/$THIS_VERSION";
-    rm -rf "$ver";
-    ver=$(needir "$ver");
-    find "$ver" -type f;
-    pause;
-    :;
-    ln -f $* $ver;
-    find "$ver" -type f
-}
-dp () 
-{ 
-    : do Dot Prof;
-    : date: 2022-08-19;
-    : date: 2022-09-07;
-    set -- ./.prof;
-    [[ -f $1 ]] || cp $(dp_lib)/dot.prof $1
-    source $1
-}
-xx ()
-{
-    set -- foo bar zot;
-    eval "$1 () { $boiler; [[ \$# -ge 1 ]] && { setenv $2 \"\$1\"; }; echo \${$param}; }" 
-    [[ $# -gt 2 ]] && { 
-        $1 "$3"
-    }
-}
-dp_init () 
-{ 
-    : generic, have an "obsolete" member to take out the trash;
-    : date: 2022-08-20;
-    : date: 2022-08-22;
-    : date: 2022-09-04;
-    : date: 2022-09-06;
-    isfunction dp_obsolete && dp_obsolete unset;
-    : manufacture DP_ ROOT, VERSION functions, include names in ALL.
-    : installations might unset,
-    setget dp_root $HOME/dropbox/marty3/git/dp;
-    setget dp_version 0.4.a    
-}
-dp_all () 
-{ 
-    : all the functions in the DP family;
-    : date: 2022-08-22;
-    : date: 2022-09-04;
-    : date: 2022-09-07;
-    ${*:-echo} dp			\
-	       dp_{root,version,all}    \
-    	       dp_{abstracts,diff,example,funs,hint,init,install}	\
-	       dp_{profs,test,tolibrary,utilities}			\
-	       dp_{cblock,compareall,functions,header,libraries}	\
-	       dp_{clear,restore,rmfunctions}
 
-}
 false &&
 {
 	return;
@@ -179,10 +15,70 @@ false &&
     # dp help
     # dp_install
     # dp_libraries ./.prof | grep functionlib | field 1
-}
-    on
-    off
+    # ====== ==========================================================	==
     # unset dp_{root,version}
     # dp_init
     # do_whf $(dp_utilities | functions) | tee .utils.out |  field 2 | sort | uniq -c
+    # ---------------------------- debuging, DEVELOPMENT testing on DFG	--
+    #    
+    # 1. newfunction, test the No-Arg reply: dp_wlhf
+    # ... subordinate: dp_qfile
+    # ... dp_qfile foo bar
+    # ... dp_qfile dp bar
+    # dp_qfile backup ./dplib
+    # dp_qfile dp ./dplib
+    # dp_wlhf $(functions .prof)
+    # 2. then test with some args,
+    # dp_wlhf_test
+    # echo .  .  .
+    # column < tmp/wlhf.rdb
+    # 3. then return functions
+    # 3.a.1 -- functionlib, copy
+    # funslib $(dp_wlhf_test | grep functionlib | field 1)
+    # 3.a.2 -- functionlib, verify update
+    # source functionlib
+    # shd_latest $(functions $(which functionlib)) | sort | tail
+    # 3.b.1 -- dplib
+    # libfuns ./dplib $(fdp | grep dp_)
+    # 4 -- verify library, values, installation, versioned files
+    # dp_compareall dp
+    # dp_root
+    # dp_version
+    # dp_install
+    # find bin lib version -type f
+    # 5. clean out .prof
+    # dp_functions
+    # declare -f dp_{qfile,wlhf}
+}
+    #
+    # --------------------------- debuging, MAINTENANCE testing locally	--    
+    #
+    # rm -f .prof.*
+    # dp_restore
+    #    
+    # -------------------------- debuging, INTEGRATION testing on DFG	--
+    #
+    # def dp
+    # ------
+    # libfuns ./dplib dp $(fdp | grep ^dp)
+    # source ./dplib
+    # shd_latest $(functions ./dplib) | sort
+    # ------
+    # dp_clear;
+    # dp_restore
+    # dp_hint declare -f
+    # ------    
+    # dp_install
+    # source ./dp_app
+    # shd_latest $(functions ./dp_app) | sort
+    # ------        
+    # -------------------------------------- VERSIONING locally	--
+    # git
+    git add newfeatures
+    echo ------        
+    gagm
+    echo ------            
+    git
+    echo ------            
+    
     

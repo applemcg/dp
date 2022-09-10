@@ -1,6 +1,5 @@
-
-Dot Prof Workflow
-=================
+#+INCLUDE: ./orgheader.org
+#+TITLE: Dot Prof Workflow
 
 Functions, *local* and non-local are entered in the **.prof** file,
 either new functions, or copies of existing functions which may need
@@ -14,7 +13,7 @@ set of tasks.  The user functions are collected in this library; they
 are supported by a heterogeneous group of functions, some or which are
 general utilities, many of which may come from other specific
 functional groups.  Specifically, in the case of the Dot Prof App,
-**dp\_app**, functions come from from a **backup** group and a
+**dp_app**, functions come from from a **backup** group and a
 **report** group. These later supply the Versioning features at a high
 level and the argument validation at a low level.
 
@@ -28,8 +27,8 @@ workflow separates requirements Changelog or Semantic Versioning
 features. The resulting function library and enclosing App may be used
 without reference to those practices.
 
-Format of the Dot Prof file
----------------------------
+* Format of the Dot Prof file
+
 
 The .prof file will have four sections in the order here:
 
@@ -40,8 +39,8 @@ The .prof file will have four sections in the order here:
 
 See the Details of each section below, The Dot Prof Sections.
 
-Executing the Dot Prof
-----------------------
+* Executing the Dot Prof
+
 
 	dp   # or manually,
 	source ./.prof
@@ -49,8 +48,8 @@ Executing the Dot Prof
 where the **dp** function also, one might say "gratuitously" backs up a
 changed .prof file.
 
-Save .prof Functions in the Appropriate Library
------------------------------------------------
+* Save .prof Functions in the Appropriate Library
+
 
 Libraries are either local (under development) or non-local (existing
 libraries on the PATH) are identified with this command which returns
@@ -63,7 +62,7 @@ Identify library names, for many functions:
 
     do_whf $(fdp) | field 2 | sort -u # noting individual libraries
 
-### Functions with a library
+** Functions with a library
 
 	 For any libraries with a function or more
 
@@ -73,7 +72,7 @@ Identify library names, for many functions:
 	libfuns $(do_whf $(fdp) | grep $1) field 1)
 	shift # repeat if necessary
 
-###	New functions
+***	New functions
 
 For new .prof functions (not yet in a library) using the family name, i.e. dp_
 
@@ -92,18 +91,18 @@ For the default library -- functionlib, a function with no home:
 	:
 	funslib $(do_whf $(fdp) | field 1);	
 	
-The Dot Prof Sections
----------------------
+* The Dot Prof Sections
+
 
 These are from a current **.prof**
 
-### the Header block
+** the Header block
 
 The header block, much as a users .profile, collects features from the user's
 Environment, and sets variables particular to the development directory
 
     source functionlib 2> /dev/null
-    source ./dp\_app 2> /dev/null
+    source ./dp_app 2> /dev/null
     source ./dplib  2> /dev/null
     export USER_BACKUP_AREA=/git/
     export ALTERNATE_BACKUP_DIRS=".bak ../version"
@@ -115,27 +114,26 @@ The function libraries are "source"d from most to least general.
    necessary, sourcing it here is a useful precaution. It's possible
    some functions being updated in the Dot Prof may have their current
    version in the functionlib library.  
-1. the **dp\_app** contains all the functions from the **dplib**, and those
+1. the **dp_app** contains all the functions from the **dplib**, and those
    from the functionlib used by the Dot Prof functions.  It is built during
    the installation process.   
 1. the **dplib** is sourced after the companion APP since it updates functions
    in the app during the install process.   As a result the hierarchy of 
    operative function definitions being tested:
    1. **.prof** definition is preferred over one in **dplib**, or any other
-   1. **dplib** definition is preferred over one in **dp\_app**, or any other
-   1. **dp\_app** definition is preferred over one in **functionlib**.
+   1. **dplib** definition is preferred over one in **dp_app**, or any other
+   1. **dp_app** definition is preferred over one in **functionlib**.
    
 Also, similar to the user's .profile, a few enviroment variables may be assigned
 in the header block.  The usage here comes from my **backuplib**, documented in
 [The Only Backup You'll Ever Need](http://mcgowans.org/pubs/marty3/commonplace/software/backupfunction.html "backup")
 
 
-### Comment Block
+** Comment Block
 
 The comment block, shielded by the **false** command has copies of
 recent statements from the **execution** block
 
-    # ------------------------------------------- COMMENT BLOCK	--
     false &&
     {
         dp_utilities | tee $(dp_utillib)
@@ -147,14 +145,12 @@ recent statements from the **execution** block
         dp_diff ; comment missing args
         # lib_tidy ./dplib
         # def compare_all_lib
-    
-        #  ------------- this is where other maintenance utilities are invoked,	--
         #
         # 1). "compare_all_lib" doesn't belong here, it's now part of the process,
     }
 	
 
-### Execution Block	
+** Execution Block	
 
 This is why the Dot Prof workflow is useful. The objective is to unit
 test the functions under development.
@@ -173,8 +169,8 @@ more executable statements.  For example, if "compare_all_lib" needs
 to be executed, simply delete the shell comment sharp (#).  This is
 where the functions may be unit tested.
 
-Example Update
---------------
+* Example Update
+
 
 A sketchy list of steps for the next release. This assumes the
 versioning in use here. To be fleshed out before version 1.0.0
@@ -193,9 +189,7 @@ versioning in use here. To be fleshed out before version 1.0.0
 1. add **fun_asapp** to **dp**, test
 
 
-
-Versioning
-----------
+* Versioning
 
 Not imposed by the DP tools, but use of **git** in a **Semantic Versioning**
 environment.   Coordinating git versions with the Semantic Version is not
@@ -205,9 +199,7 @@ version may be closed.
 
 See the **Versioning** paper.
 
-Functions
----------
-
+* Functions
 
 1. qf
 
@@ -219,18 +211,18 @@ Functions
         declare -f ${*:-qf} | tee .qf
     }
 
-1. code\_tomd
+1. code_tomd
 
-    code\_tomd () 
+    code_tomd () 
     { 
         : prepare Functions for including in a Markdown;
         : date: 2022-08-29;
         declare -f $* | fourspaces | tee .qf | show_tmpclip
     }
 
-1. compare\_all\_lib () 
+1. compare_all_lib () 
 
-    compare\_all\_lib () 
+    compare_all_lib () 
     { 
         : compare set vs lib function lists;
         : anticipates the general case;

@@ -1,0 +1,11 @@
+fold_certain_brace_expansion () 
+{
+    : specific example of ~ 
+    declare -f dp_all | sed 's/ \(dp_{\)/	\\\
+        \1/g'
+}
+app_obsolescence ()
+{
+     : simple template, needs appending to the current xx_obsolete
+     eval "${1}_obsolete () { \${*:-echo} ${1}_$2 ${1}_obsolete; }"
+}
