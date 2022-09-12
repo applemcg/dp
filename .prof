@@ -1,10 +1,16 @@
 source functionlib 2> /dev/null
+def setget; pause
 source ./dp_app    2> /dev/null
 source ./dplib     2> /dev/null
+def setget; pause
 export USER_BACKUP_AREA=/git/
 export ALTERNATE_BACKUP_DIRS=".bak ./version"
 alias dpd='off; source ./.prof'
-
+def setget; pause
+no_knownlib () 
+{ 
+    : part of test case for dp_libraries
+}
 false &&
 {
 	return;
@@ -15,72 +21,28 @@ false &&
     # dp help
     # dp_install
     # dp_libraries ./.prof | grep functionlib | field 1
-    # ====== ==========================================================	==
-    # unset dp_{root,version}
-    # dp_init
-    # do_whf $(dp_utilities | functions) | tee .utils.out |  field 2 | sort | uniq -c
-    # ---------------------------- debuging, DEVELOPMENT testing on DFG	--
-    #    
-    # 1. newfunction, test the No-Arg reply: dp_wlhf
-    # ... subordinate: dp_qfile
-    # ... dp_qfile foo bar
-    # ... dp_qfile dp bar
-    # dp_qfile backup ./dplib
-    # dp_qfile dp ./dplib
-    # dp_wlhf $(functions .prof)
-    # 2. then test with some args,
-    # dp_wlhf_test
-    # echo .  .  .
-    # column < tmp/wlhf.rdb
-    # 3. then return functions
-    # 3.a.1 -- functionlib, copy
-    # funslib $(dp_wlhf_test | grep functionlib | field 1)
-    # 3.a.2 -- functionlib, verify update
-    # source functionlib
-    # shd_latest $(functions $(which functionlib)) | sort | tail
-    # 3.b.1 -- dplib
-    # libfuns ./dplib $(fdp | grep dp_)
-    # 4 -- verify library, values, installation, versioned files
-    # dp_compareall dp
-    # dp_root
-    # dp_version
-    # dp_install
-    # find bin lib version -type f
-    # 5. clean out .prof
-    # dp_functions
-    # declare -f dp_{qfile,wlhf}
-    # -------------------------------------- VERSIONING locally	--
-    # git
-    # git add newfeatures
-    # gagm
-    # backup $(backup_files)
-    # backup_ver $(dp_version)
-    # llrt $(find version -type f )
-    # git add version/0.4.a/*
-    gagm
-    git commit -m $(dp_version)    
-    git push
-    git
+ on
+    sed -n '/^false/,$p' ./.prof | grep -v '^ *#'
+ off
+    unset foo FOO 2>/dev/null
+    unset zot ZOT 2>/dev/null
+    unset bar BAR 2>/dev/null 
+    setget foo bar
+    setget zot
+    zot 'this is OK too'
 }
-    #
-    # --------------------------- debuging, MAINTENANCE testing locally	--    
-    #
-    # rm -f .prof.*
-    # dp_restore
-    #    
-    # -------------------------- debuging, INTEGRATION testing on DFG	--
-    #
-    # def dp
-    # ------
-    # libfuns ./dplib dp $(fdp | grep ^dp)
-    # source ./dplib
-    # shd_latest $(functions ./dplib) | sort
-    # ------
-    # dp_clear;
-    # dp_restore
-    # dp_hint declare -f
-    # ------    
-    # dp_install
-    # source ./dp_app
-    # shd_latest $(functions ./dp_app) | sort
-    # ------        
+    # bin_lib .prof
+    # nxt_lsdb no_knownlib
+    # def nxt_whf | tee .qf
+
+    # time nxt_wlhf $(dp_functions)
+    # time 
+    # diff .{nxwf,wlhf}.out
+    # dp_libraries   -- finds DUPs, wlhf not Yet
+    # ls $(dfg_db)/*/printfirst
+    # dp_wlhf printfirst
+    dp_compareall dp    
+on
+off                
+    dp_wlhf $(dp_functions) | printfirst
+    

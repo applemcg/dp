@@ -309,3 +309,11 @@ dp_wlhf_test ()
     : ----------------------- ) | tee $(needir tmp)/wlhf.rdb | rowhas file ${1:-functionlib}
 }
 eval dp_init 1>&2
+dp_all () 
+{ 
+    : all the functions in the DP family;
+    : date: 2022-08-22;
+    : date: 2022-09-10;
+    : date: 2022-09-12;
+    ${*:-echo} dp dp_{root,version,all} dp_{abstracts,diff,example,funs,init,install} dp_{profs,test,tolibrary,utilities,hint,binlib} dp_{cblock,compareall,functions,header,libraries} dp_{clear,restore,rmfunctions,qfile,wlhf{,_test}}
+}
