@@ -21,7 +21,7 @@ versioning with a GitHub REPO.
 
 ### Deprecated
 
-* **dp_qfile**  -- considerable performace win with new wlht
+* **dp_qfile**  -- considerable performance win with new wlht
 
 ### Security
 
@@ -32,12 +32,9 @@ A big hole I'm noticing, is the workflow needs to be tightened
 up. Explicit dependencies in
 
 + dplib
-
 + dpapp -- make explicit dependencies on any library appearing in the
   header block
-
 + sourcing libraries in the header
-
 + timing of 
     - $ backup\_ver $(dp_version) 
 	- $ git commit ...; git push
@@ -63,7 +60,7 @@ immediate past and pending versions.
   compatible with **dfg** usage
 * Workflow is now in OrgMode
 * *dp_root*, *dp_version* are now assigned in *dp_init* by **setget**,
-  and may be set by user from the commmand line.
+  and may be set by user from the command line.
 
 ### Fixed
 
