@@ -1,7 +1,7 @@
 
 # Changelog
 
-All notable changes to this project will be documented in this file.
+-- All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
@@ -17,35 +17,59 @@ versioning with a GitHub REPO.
 
 ### Changed
 
+### Fixed
+
 ### Deprecated
 
-### Fixed
+* **dp_qfile**  -- considerable performace win with new wlht
 
 ### Security
 
 
 ## [0.4.a] TBD
 
+A big hole I'm noticing, is the workflow needs to be tightened
+up. Explicit dependencies in
+
++ dplib
+
++ dpapp -- make explicit dependencies on any library appearing in the
+  header block
+
++ sourcing libraries in the header
+
++ timing of 
+    - $ backup\_ver $(dp_version) 
+	- $ git commit ...; git push
+
+create function mismatches between updated external libraries, the
+local, i.e. **dplib** and **dpapp**
+
+A use for *dp_diff* compare the .prof copy of a function to it's
+home library, and if a local library, the additional version copies,
+immediate past and pending versions.
+
 ### Added
 
+* *dp_binlib* finds the path location of the library in bin directory
+* *dp_hint* on the abstracts, and repair functions
 * *dp_wlhf* which library has the Function
-* *funclocn* ??, part of the TBD
 * *dp_clear*  anticipates dp_restore
-* *dp_root*, *dp_version* are now assigned in *dp_init* by **setget**,
-    and may be set by user from the commmand line.
+* *dp_{clear,restore,rmfunctions}*, repair functions to clean out the dot prof
 
 ### Changed
 
 * move dp/src/* to dp/*, simplifies **install**, also git feature and
   compatible with **dfg** usage
 * Workflow is now in OrgMode
-
-### Deprecated
+* *dp_root*, *dp_version* are now assigned in *dp_init* by **setget**,
+  and may be set by user from the commmand line.
 
 ### Fixed
 
 * **dp** itself.   Remove a gratuitous **backup**, default copy in lib/dot.prof
 
+### Deprecated
 ### Security
 
 ## [0.4.0] 2022-09-08
@@ -74,7 +98,7 @@ Moved versions from ./ver/x.y.z to ../version/x.y.z
 
 * *dputillib, dplib* FILES -- absorbed in dp_app
 * **dp_obsolete** function -- to render recent functions obsolete
-* **dp_diff**
+
 ### Fixed
 
 * **dp_funs** leaked without arguments 
