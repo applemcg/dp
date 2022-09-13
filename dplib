@@ -46,7 +46,8 @@ dp_all ()
     : all the functions in the DP family;
     : date: 2022-08-22;
     : date: 2022-09-10;
-    ${*:-echo} dp dp_{root,version,all} dp_{abstracts,diff,example,funs,init,install} dp_{profs,test,tolibrary,utilities} dp_{cblock,compareall,functions,header,libraries} dp_{clear,restore,rmfunctions,qfile,wlhf{,_test}}
+    : date: 2022-09-13;
+    ${*:-echo} dp dp_{root,version,all} dp_{abstracts,diff,example,funs,init,install} dp_{binlib,hint} dp_{profs,test,tolibrary,utilities} dp_{cblock,compareall,functions,header,libraries} dp_{clear,restore,rmfunctions,qfile,wlhf{,_test}}
 }
 dp_example () 
 { 
@@ -71,15 +72,13 @@ dp_init ()
 { 
     : generic, have an "obsolete" member to take out the trash;
     : date: 2022-08-20;
-    : date: 2022-09-10;
     : date: 2022-09-12;
+    : date: 2022-09-13;
     isfunction dp_obsolete && dp_obsolete unset;
-    : manufacture DP_ ROOT, VERSION functions, include names in ALL.;
-    : todo: test both aspects, VARIABLE, and function;
+    : manufacture DP_ ROOT function, include name in ALL.;
     :;
-    unset dp_{root,version} DP_{ROOT,VERSION} 2> /dev/null;
-    setget dp_root $HOME/dropbox/marty3/git/dp;
-    setget dp_version 0.4.a
+    unset dp_root DP_ROOT 2> /dev/null;
+    setget dp_root $HOME/dropbox/marty3/git/dp
 }
 dp_install () 
 { 
@@ -121,8 +120,7 @@ dp_profs ()
 }
 dp_root () 
 { 
-    : mfg: dp_init;
-    : date: 2022-09-08;
+    : manufactured by DP_INIT from SETGET version 2022-09-13;
     [[ $# -ge 1 ]] && { 
         setenv DP_ROOT "$1"
     };
@@ -139,17 +137,20 @@ dp_test ()
 dp_utilities () 
 { 
     : functions used by dplib functions;
+    : no UNDERSCORE functions, i.e. "_thisfun" permitted;
+    : related: dp_restore;
     : date: 2022-08-20;
-    declare -f $(comm -23 <(app_fun $(functions dplib) 2> /dev/null) <( dp_all| tpl))
+    : date: 2022-09-13;
+    report_notfile ./dplib && return 1;
+    app_fun $(functions dplib) 2> /dev/null | grep -v ^_ > .applist;
+    dp_all | tpl | sort > .dplist;
+    command declare -f $(comm -23 .applist .dplist)
 }
 dp_version () 
 { 
-    : mfg: dp_init;
-    : date: 2022-09-08;
-    [[ $# -ge 1 ]] && { 
-        setenv DP_VERSION "$1"
-    };
-    echo ${DP_VERSION:?}
+    : updated as needed;
+    : date: 2022-09-13;
+    ${*:-echo} echo 0.4.a
 }
 dp_diff () 
 { 
@@ -174,16 +175,19 @@ dp_diff ()
 }
 dp_tolibrary () 
 { 
-    : write dot prof functions to their primary directory;
+    : write script to copy dot prof functions to their primary directory;
+    : omits those with no particular home;
+    : related: dp_solos;
     : date: 2022-08-25;
     : date: 2022-09-06;
+    : date: 2022-09-13;
     local out=./funlib.out;
-    for dir in $(
-      do_whf $(dp_functions) | tee $out | nf gt 1 | field 2 | sort -u
+    for funlib in $(
+      dp_wlhf $(dp_functions) | tee $out | nf gt 1 | field 2 | sort -u
       );
     do
-        local lib=$(basename $dir);
-        echo funslib $(grep $lib $out| field 1);
+        local libname=$(basename $funlib);
+        echo libfuns $funlib $(grep $libname $out| field 1);
     done | tee .tolibrary.sh;
     comment source .tolibrary.sh
 }
@@ -361,5 +365,11 @@ dp_binlib ()
     report_notfile ${1:-/dev/null};
     debug ENTRY $*;
     which $(basename $(dirname $1))
+}
+dp_solos () 
+{ 
+    : list Homeless dot prof functions;
+    : date: 2022-09-13;
+    dp_wlhf $(dp_functions) | printfirst | nf lt 2
 }
 eval dp_init 1>&2

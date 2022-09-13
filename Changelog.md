@@ -15,13 +15,13 @@ versioning with a GitHub REPO.
 
 ### Added
 
+Search the **prof** family for members which belong here
+
 ### Changed
 
 ### Fixed
 
 ### Deprecated
-
-* **dp_qfile**  -- considerable performance win with new wlht
 
 ### Security
 
@@ -32,7 +32,7 @@ A big hole I'm noticing, is the workflow needs to be tightened
 up. Explicit dependencies in
 
 + dplib
-+ dpapp -- make explicit dependencies on any library appearing in the
++ dp_app -- make explicit dependencies on any library appearing in the
   header block
 + sourcing libraries in the header
 + timing of 
@@ -40,7 +40,7 @@ up. Explicit dependencies in
 	- $ git commit ...; git push
 
 create function mismatches between updated external libraries, the
-local, i.e. **dplib** and **dpapp**
+local, i.e. **dplib** and **dp_app**
 
 A use for *dp_diff* compare the .prof copy of a function to it's
 home library, and if a local library, the additional version copies,
@@ -67,6 +67,9 @@ immediate past and pending versions.
 * **dp** itself.   Remove a gratuitous **backup**, default copy in lib/dot.prof
 
 ### Deprecated
+
+* **dp_qfile**  -- considerable performance win with new wlht
+
 ### Security
 
 ## [0.4.0] 2022-09-08

@@ -1,19 +1,18 @@
+comment Header Block
 source functionlib 2> /dev/null
-def setget; pause
-source ./dp_app    2> /dev/null
+ource ./dp_app    2> /dev/null
 source ./dplib     2> /dev/null
-def setget; pause
 export USER_BACKUP_AREA=/git/
 export ALTERNATE_BACKUP_DIRS=".bak ./version"
 alias dpd='off; source ./.prof'
-def setget; pause
+comment Function Block
 no_knownlib () 
 { 
     : part of test case for dp_libraries
 }
+comment Comment Block
 false &&
 {
-	return;
 	# see Workflow.md
 
     see DOT fuse for "fuse"
@@ -21,9 +20,7 @@ false &&
     # dp help
     # dp_install
     # dp_libraries ./.prof | grep functionlib | field 1
- on
     sed -n '/^false/,$p' ./.prof | grep -v '^ *#'
- off
     unset foo FOO 2>/dev/null
     unset zot ZOT 2>/dev/null
     unset bar BAR 2>/dev/null 
@@ -31,6 +28,8 @@ false &&
     setget zot
     zot 'this is OK too'
 }
+
+comment Execution Block
     # bin_lib .prof
     # nxt_lsdb no_knownlib
     # def nxt_whf | tee .qf
@@ -41,8 +40,14 @@ false &&
     # dp_libraries   -- finds DUPs, wlhf not Yet
     # ls $(dfg_db)/*/printfirst
     # dp_wlhf printfirst
-    dp_compareall dp    
+    # dp_compareall dp    
 on
 off                
-    dp_wlhf $(dp_functions) | printfirst
-    
+   dp_wlhf $(dp_functions) | printfirst
+   echo ----------
+   # dp_utilities
+   # dp_solos
+   # dp_init
+   # def dp_root
+   dp_tolibrary
+   
